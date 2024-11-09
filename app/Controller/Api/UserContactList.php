@@ -41,7 +41,7 @@ class UserContactList extends Api {
             //USUÁRIOS
             $itens[] = [
                 'id' => $obUser->id,
-                'nome' => $obUser->nome,
+                'nome' => $obUserContactList->apelido,
                 'email' => $obUser->email,
                 'fone' => $obUser->fone1
             ];
@@ -79,6 +79,10 @@ class UserContactList extends Api {
             throw new Exception("O campo 'usuario_id' é obrigatório!",400);
         }
 
+        if(!isset($postVars["apelido"])) {
+            throw new Exception("O campo 'apelido' é obrigatório!",400);
+        }
+
         //VALIDA SE O ID INFORMADO NO POST É IGUAL AO ID DO USUÁRIO LOGADO
         if($request->user->id == $postVars["usuario_id"]) {
             throw new Exception('Voce nao pode se adicionar a sua lista de contatos!',400);
@@ -100,6 +104,7 @@ class UserContactList extends Api {
         $obUserContact = new EntityUserContactList();
         $obUserContact->usuario_id = $request->user->id;
         $obUserContact->contato_id = $postVars["usuario_id"];
+        $obUserContact->apelido = $postVars["apelido"];
         $obUserContact->cadastrar();
 
         return [
@@ -133,6 +138,43 @@ class UserContactList extends Api {
         //SUCESSO
         return [
             "message" => "success"
+        ];
+    }
+
+    public static function setEditContact($request){
+        //OBTÉM AS VARIÁVEIS DO POST
+        $postVars = $request->getPostVars();
+
+        //VALIDA SE FOI DIGITADO UM NÚMERO
+        if(!is_numeric($postVars["usuario_id"])) {
+            throw new Exception("Por gentileza, digite um numero valido!",400);
+        }
+
+        //VALIDA CAMPOS OBRIGATÓRIOS
+        if(!isset($postVars["usuario_id"])) {
+            throw new Exception("O campo 'usuario_id' é obrigatório!",400);
+        }
+
+        if(!isset($postVars["apelido"])) {
+            throw new Exception("O campo 'apelido' é obrigatório!",400);
+        }
+        
+        //VALIDA QUANTIDADE DE CARACTERES DIGITADOS PARA O APELIDO
+        if(strlen($postVars["apelido"]) > 45){
+            throw new Exception("O máximo de caracteres para o campo 'apelido' é de 45 caracteres!",400);
+        }
+        
+        //VALIDA SE O USUÁRIO INFORMADO EXISTE NA LISTA DE CONTATOS
+        $obUserContactList = EntityUserContactList::isUserInContactList($request->user->id,$postVars["usuario_id"]);
+        if(!$obUserContactList instanceof EntityUserContactList){
+            throw new Exception('Este usuario nao existe na lista de contatos!',400);
+        }
+
+        $obUserContactList->apelido = $postVars["apelido"];
+        $obUserContactList->atualizar();
+        
+        return [
+            "message" : "success"
         ];
     }
 }
