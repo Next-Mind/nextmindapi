@@ -18,7 +18,15 @@ class UserContactList {
      *
      * @var integer
      */
-    public $contato_id;    
+    public $contato_id; 
+
+    /**
+     * Apelido do usuário na lista de contatos
+     *
+     * @var string
+     */
+    public $apelido;
+    
     /**
      * Data em que foi realziado a adição
      *
@@ -35,6 +43,7 @@ class UserContactList {
         (new Database('lista_contatos_usuarios'))->insert([
             'usuario_id' => $this->usuario_id,
             'contato_id' => $this->contato_id,
+            'apelido'    => $this->apelido,
             'data_adicao' => Date('Y-m-d H:i:s')
         ]);
 
@@ -46,6 +55,7 @@ class UserContactList {
         (new Database('lista_contatos_usuarios'))->update("usuario_id = ".$this->usuario_id." AND contato_id = ".$this->contato_id,[
             'usuario_id' => $this->usuario_id,
             'contato_id' => $this->contato_id,
+            'apelido'    => $this->apelido,                                                          
             'data_adicao' => Date('Y-m-d H:i:s')
         ]);
     }
