@@ -26,6 +26,17 @@ $obRouter->post('/api/v1/contacts',[
     }
 ]);
 
+//ROTA DE ATUALIZAÇÃO DE CONTATO
+$obRouter->put('/api/v1/contacts',[
+    'middlewares' => [
+        'api',
+        'jwt-auth'
+    ],
+    function($request){
+        return new Response(200,Api\UserContactList::setEditContact($request),'application/json');
+    }
+]);
+
 //ROTA DE EXCLUSÃO DO USUÁRIO NA LISTA DE CONTATOS DO USER
 $obRouter->delete('/api/v1/contacts',[
     'middlewares' => [

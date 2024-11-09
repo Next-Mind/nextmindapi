@@ -174,7 +174,7 @@ class UserContactList extends Api {
         $obUserContactList->atualizar();
         
         return [
-            "message" : "success"
+            "message" => "success"
         ];
     }
 }
