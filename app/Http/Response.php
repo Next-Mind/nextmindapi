@@ -93,7 +93,6 @@ class Response{
         //IMPRIME O CONTEÚDO
         switch($this->contentType) {
             case 'text/html':
-                $this->convertToUtf8();
                 echo $this->content;
                 exit;
             case 'application/json':

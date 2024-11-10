@@ -210,6 +210,33 @@ class Router{
             }
         }
         //URL NÃO ENCONTRADA
+        return $this->handlePageNotFound();
+    }
+
+    /**
+    * Método responsável para lidar com erro 404 (página web ou api)
+    *
+    * @return void
+    * @throws Exception
+    */
+    private function handlePageNotFound() {
+        //VERIFICA SE A REQUISIÇÃO É PARA A API
+        $isApiRequest = strpos($this->getUri(), '/api/') === 0;
+
+        if ($isApiRequest) {
+            //RETORNA ERRO 404 PARA A API
+            $response = [
+                'status' => 404,
+                'error' => 'Not Found',
+                'message' => 'A rota solicitada não foi encontrada.'
+            ];
+
+            //DEFINE O CABEÇALHO PARA JSON
+            header('Content-Type: application/json');
+            echo json_encode($response);
+            exit;
+        }
+        //RETORNA PÁGINA 404 PARA A WEB
         throw new Exception(\App\Utils\View::render('404'), 404);
     }
     

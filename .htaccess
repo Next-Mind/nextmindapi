@@ -7,4 +7,4 @@ RewriteRule ^public_html/(.*)$ /$1 [L,R=301]
 
 # REGRA DE REWRITE TUDO PARA INDEX
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)$ /index.php [QSA,NC]
+RewriteRule ^(.*)$ ./index.php [QSA,NC]
