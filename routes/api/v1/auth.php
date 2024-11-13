@@ -6,6 +6,7 @@ use \App\Controller\Api;
 //ROTA DE AUTORIZAÇÃO DA API
 $obRouter->post('/api/v1/auth',[
     'middlewares' => [
+        'allow-cors',
         'api'
     ],
     function($request){

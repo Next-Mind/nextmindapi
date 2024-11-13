@@ -52,14 +52,11 @@ class UserTypes {
      * @return boolean
      */
     public function atualizar(){
-        $this->id = (new Database('tipos_usuarios'))->update('id = '.$this->id,[
+        return (new Database('tipos_usuarios'))->update('id = '.$this->id,[
             'nome' => $this->nome,
             'descricao' => $this->descricao,
             'situacao' => $this->situacao
         ]);
-
-        //SUCESSO
-        return true;
     }
     
     /**
@@ -68,12 +65,9 @@ class UserTypes {
      * @return boolean
      */
     public function inativar(){
-        $this->id = (new Database('tipos_usuarios'))->update('id = '.$this->id,[
+        return (new Database('tipos_usuarios'))->update('id = '.$this->id,[
             'situacao' => $this->situacao
         ]);
-
-        //SUCESSO
-        return true;
     }
     
     /**

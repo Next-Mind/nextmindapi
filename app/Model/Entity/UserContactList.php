@@ -50,9 +50,14 @@ class UserContactList {
         //SUCESSO
         return true;
     }
-
+    
+    /**
+     * Método responsável por atualizar o contato no banco
+     *
+     * @return boolean
+     */
     public function atualizar(){
-        (new Database('lista_contatos_usuarios'))->update("usuario_id = ".$this->usuario_id." AND contato_id = ".$this->contato_id,[
+        return (new Database('lista_contatos_usuarios'))->update("usuario_id = ".$this->usuario_id." AND contato_id = ".$this->contato_id,[
             'usuario_id' => $this->usuario_id,
             'contato_id' => $this->contato_id,
             'apelido'    => $this->apelido,                                                          

@@ -162,11 +162,11 @@ class User {
     /**
      * Método responsável por atualizar os dados no banco
      *
-     * @return void
+     * @return boolean
      */
     public function atualizar(){
         //INSERE A INSTANCIA ATUAL NO BANCO DE DADOS
-        $this->id = (new Database('usuarios'))->update('id= '.$this->id,[
+       return (new Database('usuarios'))->update('id= '.$this->id,[
             'tipo_usuario_id' => $this->tipo_usuario_id,
             'nome' => $this->nome,
             'email' => $this->email,

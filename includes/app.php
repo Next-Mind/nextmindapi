@@ -33,6 +33,7 @@ View::init([
 
 //DEFINE O MAPEAMENTO DE MIDDLEWARES
 MiddlewareQueue::setMap([
+    'allow-cors' => App\Http\Middleware\CorsMiddleware::class,
     'maintenance' => \App\Http\Middleware\Maintenance::class,
     'required-admin-logout' => \App\Http\Middleware\RequireAdminLogout::class,
     'required-admin-login' => \App\Http\Middleware\RequireAdminLogin::class,
@@ -46,5 +47,6 @@ MiddlewareQueue::setMap([
 
 //DEFINE O MAPEAMENTO DE MIDDLEWARES PADRÕES EXECUTADOS EM TODAS AS ROTAS
 MiddlewareQueue::setDefault([
+    'allow-cors',
     'maintenance'
 ]);

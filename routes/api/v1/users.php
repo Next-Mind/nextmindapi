@@ -23,7 +23,8 @@ $obRouter->get('/api/v1/users/me',[
         'jwt-auth'
     ],
     function($request){
-        return new Response(200,Api\User::getCurrentUser($request),'application/json');
+        $response = new Response(200,Api\User::getCurrentUser($request),'application/json');
+        return $response;
     }
 ]);
 
