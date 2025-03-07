@@ -4,31 +4,41 @@ namespace App\Http\Middleware;
 
 use Kreait\Firebase\Factory;
 
+use \App\Utils\Logger\Logger;
+
 use \Exception;
 
 class FirebaseAuth
 {
+    private Logger $logger = new Logger('FirebaseAuthMiddleware');
     private function getFirebaseAuthUser($request)
     {
         //INICIA A INSTÂNCIA DO FIREBASE
         $firebase = (new Factory)
-            ->withServiceAccount(FIREBASE_KEY)
-            ->createAuth();
+            ->withServiceAccount(FIREBASE_KEY);
+
+        $this->logger->debug('Instância do Firebase SDK Iniciada');
+
+        $auth = $firebase->createAuth();
+
+        $this->logger->debug('Instância do Firebase Auth Iniciada');
 
         //HEADERS
         $headers = $request->getHeaders();
+
+        $this->logger->debug("Headers obtidos: " . json_encode($headers));
 
         //TOKEN PURO
         $token = isset($headers['Authorization']) ? str_replace('Bearer ', '', $headers['Authorization']) : '';
 
         try {
-            $verifiedToken = $firebase->verifyIdToken($token);
+            $verifiedToken = $auth->verifyIdToken($token);
         } catch (Exception $e) {
             throw new Exception("Token inválido", 400);
         }
 
         $uid = $verifiedToken->headers()->get('sub');
-        $user = $firebase->getUser($uid);
+        $user = $auth->getUser($uid);
         return $user;
     }
 

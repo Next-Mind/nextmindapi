@@ -4,34 +4,40 @@ namespace App\Http\Middleware;
 
 use Closure;
 use \App\Model\Entity\ApiKeys as EntityApiKeys;
+use App\Utils\Logger\Logger;
 use Exception;
 
-class ApiKeyAuth {
+class ApiKeyAuth
+{
+
+    private Logger $logger = new Logger('ApiKeyAuthMiddleware');
 
     private $prefixMap = [
         'NXTM-' => 'mobile',
         'NXTD-' => 'desktop',
-        'NXTW-' => 'web' 
+        'NXTW-' => 'web'
     ];
 
-    private function definePlatformByPrefix($apiKey) {
-        $prefix = substr($apiKey,0,5);
+    private function definePlatformByPrefix($apiKey)
+    {
+        $prefix = substr($apiKey, 0, 5);
         $platform = $this->prefixMap[$prefix] ?? null;
         return $platform;
     }
-    
+
     /**
      * Método responsável por recuperar a hash da api key no banco de dados baseado na plataforma
      *
      * @param  string $platform
      * @return mixed
      */
-    private function getStoredHashedApiKey($platform) {
+    private function getStoredHashedApiKey($platform)
+    {
         $obApiKey = EntityApiKeys::getApiKeyByPlatform($platform);
         return  $obApiKey instanceof EntityApiKeys ? $obApiKey : false;
     }
 
-    
+
     /**
      * Método responsável por executar o middleware
      *
@@ -39,7 +45,11 @@ class ApiKeyAuth {
      * @param  Closure $next
      * @return Response
      */
-    public function handle($request, Closure $next) {
+    public function handle($request, Closure $next)
+    {
+
+        $this->logger->debug('Middleware Acionado');
+
         //OBTÉM OS HEADERS DA REQUISIÇÃO
         $headers = $request->getHeaders();
 
@@ -53,8 +63,8 @@ class ApiKeyAuth {
         $storedHashedApiKey = $this->getStoredHashedApiKey($platform);
 
         //VALIDA A CHAVE DA API
-        if(!$storedHashedApiKey || !password_verify($apiKey,$storedHashedApiKey->hash_api_key)) {
-            throw new Exception("Api Key Invalida!",403);
+        if (!$storedHashedApiKey || !password_verify($apiKey, $storedHashedApiKey->hash_api_key)) {
+            throw new Exception("Api Key Invalida!", 403);
         }
 
         return $next($request);

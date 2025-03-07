@@ -2,9 +2,14 @@
 
 namespace App\Http\Middleware;
 
+use App\Utils\Logger\Logger;
+
 class CorsMiddleware
 {
-    public static function handle($request,$next)
+
+    private Logger $logger = new Logger('CorsMiddleware');
+
+    public function handle($request, $next)
     {
         //CONFIGURAÇÕES DEFINIDAS NO .env
         $allowedOrigins = getenv('CORS_ALLOWED_ORIGINS') ?: '*';
@@ -18,8 +23,8 @@ class CorsMiddleware
         header("Access-Control-Allow-Headers: $allowedHeaders");
         header("Access-Control-Allow-Credentials: $allowCredentials");
 
-        file_put_contents(__DIR__.'/../cors_log.txt', "Método: {$_SERVER['REQUEST_METHOD']}\n", FILE_APPEND);
-        
+        $this->logger->debug("Método: {$_SERVER['REQUEST_METHOD']}");
+
         // Respondendo a requisições OPTIONS diretamente
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
             http_response_code(204);

@@ -7,8 +7,7 @@ use \App\Controller\Api;
 $obRouter->get('/api/v1/users', [
     'middlewares' => [
         'api',
-        'firebase-auth',
-        'cache'
+        'firebase-auth'
     ],
     function ($request) {
         return new Response(200, Api\User::getUsers($request), 'application/json');

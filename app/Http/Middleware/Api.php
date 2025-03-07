@@ -2,8 +2,13 @@
 
 namespace App\Http\Middleware;
 
-class Api{
-        
+use App\Utils\Logger\Logger;
+
+class Api
+{
+
+    private Logger $logger = new Logger('ApiMiddleware');
+
     /**
      * Método responsável por executar o middleware
      *
@@ -11,9 +16,13 @@ class Api{
      * @param  Closure $next
      * @return Response
      */
-    public function handle($request,$next){
+    public function handle($request, $next)
+    {
+        $this->logger->debug('Middleware raiz da API acionado.');
         //ALTERA O CONTENT TYPE PARA JSON
         $request->getRouter()->setContentType('application/json');
+
+
 
         //EXECUTA O PRÓXIMO NÍVEL DO MIDDLEWARE
         return $next($request);
