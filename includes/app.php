@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__.'/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 
 use \App\Utils\View;
@@ -12,7 +12,7 @@ use \WilliamCosta\DatabaseManager\Database;
 date_default_timezone_set('America/Sao_Paulo');
 
 //CARREGA AS VARIÁVEIS DE AMBIENTE
-Environment::load(__DIR__.'/../');
+Environment::load(__DIR__ . '/../');
 
 //DEFINE AS CONFIGURAÇÕES DE BANCO DE DADOS
 Database::config(
@@ -24,7 +24,7 @@ Database::config(
 );
 
 //DEFINE A CONSTANTE DE URL
-define('URL',getenv('URL'));
+define('URL', getenv('URL'));
 
 //DEFINE O VALOR PADRÃO DAS VARIÁVEIS
 View::init([
@@ -41,8 +41,9 @@ MiddlewareQueue::setMap([
     'user-basic-auth' => \App\Http\Middleware\UserBasicAuth::class,
     'jwt-auth' => \App\Http\Middleware\JWTAuth::class,
     'cache' => \App\Http\Middleware\Cache::class,
-    'api-key-auth' => \App\Http\Middleware\ApiKeyAuth::class
-    
+    'api-key-auth' => \App\Http\Middleware\ApiKeyAuth::class,
+    'firebase-auth' => \App\Http\Middleware\FirebaseAuth::class
+
 ]);
 
 //DEFINE O MAPEAMENTO DE MIDDLEWARES PADRÕES EXECUTADOS EM TODAS AS ROTAS
@@ -50,3 +51,6 @@ MiddlewareQueue::setDefault([
     'allow-cors',
     'maintenance'
 ]);
+
+//DEFINE O CAMINHO E O NOME DO ARQUIVO COM AS CHAVES PRIVADAS DO FIREBASE
+define('FIREBASE_KEY', __DIR__ . '/../' . getenv('FIREBASE_KEY_PATH'));

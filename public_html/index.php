@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__.'/includes/app.php';
+require __DIR__ . '/../includes/app.php';
 
 use \App\Http\Router;
 
@@ -14,11 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-
 $obRouter = new Router(URL);
 
 //INCLUI AS ROTAS DA API 
-include __DIR__.'/routes/api.php';
+include __DIR__ . '/../routes/api.php';
 
 //IMPRIME O RESPONSE DA ROTA
 $obRouter->run()->sendResponse();
