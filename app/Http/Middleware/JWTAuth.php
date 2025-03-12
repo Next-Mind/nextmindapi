@@ -11,7 +11,7 @@ use \Firebase\JWT\Key;
 class JWTAuth
 {
 
-    private Logger $logger = new Logger('JWTAuth');
+    private Logger $logger;
 
     /**
      * Método responsável por retornar uma instância de usuário autenticado
@@ -68,6 +68,7 @@ class JWTAuth
      */
     public function handle($request, $next)
     {
+        $this->logger = new Logger('JWTAuth');
         $this->logger->debug('Middleware acionado');
 
         //REALIZA A VALIDAÇÃO DO ACESSO VIA JWT

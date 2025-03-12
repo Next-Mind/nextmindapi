@@ -19,7 +19,6 @@ class Logger
 
         // Verifica a existência do diretório e cria se necessário
         if (!file_exists($dir)) {
-            echo 'amigo eu esto aqui';
             mkdir($dir, 0755, true);
         }
 

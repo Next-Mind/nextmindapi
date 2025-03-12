@@ -248,12 +248,13 @@ class Router
             $response = [
                 'status' => 404,
                 'error' => 'Not Found',
-                'message' => 'A rota solicitada não foi encontrada.'
+                'message' => 'A rota solicitada não foi encontrada.',
+                'timestamp' => date('c')
             ];
 
             //DEFINE O CABEÇALHO PARA JSON
-            header('Content-Type: application/json');
-            echo json_encode($response);
+            $this->contentType = 'application/json';
+            throw new Exception('A rota solicitada não foi encontrada.', 404);
             exit;
         }
         //RETORNA PÁGINA 404 PARA A WEB
@@ -290,7 +291,7 @@ class Router
             //RETORNA A EXECUÇÃO DA FILA DE MIDDLEWARES
             return (new MiddlewareQueue($route['middlewares'], $route['controller'], $args))->next($this->request);
         } catch (Exception $e) {
-            return new Response($e->getCode(), $this->getErrorMessage($e->getMessage()), $this->contentType);
+            return new Response($e->getCode(), $this->getErrorMessage($e), $this->contentType);
         }
     }
 
@@ -300,16 +301,19 @@ class Router
      * @param  string $message
      * @return mixed
      */
-    private function getErrorMessage($message)
+    private function getErrorMessage(Exception $e)
     {
         switch ($this->contentType) {
             case 'application/json':
                 return [
-                    'error' => $message
+                    'status' => 'error',
+                    'code' => $e->getCode(),
+                    'message' => $e->getMessage(),
+                    'timestamp' => date('c')
                 ];
                 break;
             default:
-                return $message;
+                return $e->getMessage();
                 break;
         }
     }

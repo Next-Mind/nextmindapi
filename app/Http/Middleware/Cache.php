@@ -8,7 +8,7 @@ use \App\Utils\Logger\Logger;
 class Cache
 {
 
-    private Logger $logger = new Logger('CacheMiddleware');
+    private Logger $logger;
 
     /**
      * Método responsável por verificar se a request atual pode ser cacheada
@@ -66,6 +66,7 @@ class Cache
      */
     public function handle($request, $next)
     {
+        $this->logger = new Logger('CacheMiddleware');
 
         $this->logger->debug('Middleware acionado');
 

@@ -14,6 +14,7 @@ date_default_timezone_set('America/Sao_Paulo');
 //CARREGA AS VARIÁVEIS DE AMBIENTE
 Environment::load(__DIR__ . '/../');
 
+
 //DEFINE AS CONFIGURAÇÕES DE BANCO DE DADOS
 Database::config(
     getenv('DB_HOST'),
@@ -35,21 +36,21 @@ View::init([
 MiddlewareQueue::setMap([
     'allow-cors' => App\Http\Middleware\CorsMiddleware::class,
     'maintenance' => \App\Http\Middleware\Maintenance::class,
-    'required-admin-logout' => \App\Http\Middleware\RequireAdminLogout::class,
-    'required-admin-login' => \App\Http\Middleware\RequireAdminLogin::class,
     'api' => \App\Http\Middleware\Api::class,
-    'user-basic-auth' => \App\Http\Middleware\UserBasicAuth::class,
     'jwt-auth' => \App\Http\Middleware\JWTAuth::class,
     'cache' => \App\Http\Middleware\Cache::class,
     'api-key-auth' => \App\Http\Middleware\ApiKeyAuth::class,
-    'firebase-auth' => \App\Http\Middleware\FirebaseAuth::class
+    'firebase-auth' => \App\Http\Middleware\FirebaseAuth::class,
+    'requires-sign-in' => \App\Http\Middleware\RequiresSignIn::class
 
 ]);
 
 //DEFINE O MAPEAMENTO DE MIDDLEWARES PADRÕES EXECUTADOS EM TODAS AS ROTAS
 MiddlewareQueue::setDefault([
     'allow-cors',
-    'maintenance'
+    'api',
+    'maintenance',
+    'firebase-auth'
 ]);
 
 //DEFINE O CAMINHO E O NOME DO ARQUIVO COM AS CHAVES PRIVADAS DO FIREBASE

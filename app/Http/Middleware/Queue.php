@@ -42,7 +42,7 @@ class Queue
      */
     private $controllerArgs = [];
 
-    private $logger = new Logger('Middleware-queue');
+    private $logger;
 
     /**
      * Método responsável por construir a classe de fila de middlewares
@@ -54,6 +54,7 @@ class Queue
      */
     public function __construct($middlewares, $controller, $controllerArgs)
     {
+        $this->logger = new Logger('Middleware-queue');
         $this->logger->debug('Gerenciador da fila de middlewares acionado');
         $this->middlewares = array_merge(self::$default, $middlewares);
         $this->controller = $controller;

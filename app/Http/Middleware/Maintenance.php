@@ -7,7 +7,7 @@ use App\Utils\Logger\Logger;
 class Maintenance
 {
 
-    private Logger $logger = new Logger('Maintenance');
+    private Logger $logger;
 
     /**
      * Método responsável por executar o middleware
@@ -18,7 +18,7 @@ class Maintenance
      */
     public function handle($request, $next)
     {
-
+        $this->logger = new Logger('Maintenance');
         $this->logger->debug('Middleware acionado');
 
         //VERIFICA O ESTADO DE MANUTENÇÃO DA PÁGINA

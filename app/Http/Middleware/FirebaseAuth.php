@@ -5,12 +5,24 @@ namespace App\Http\Middleware;
 use Kreait\Firebase\Factory;
 
 use \App\Utils\Logger\Logger;
+use \App\Model\Entity\User as EntityUser;
 
 use \Exception;
 
 class FirebaseAuth
 {
-    private Logger $logger = new Logger('FirebaseAuthMiddleware');
+    private Logger $logger;
+
+    private function injectLocalUser($request)
+    {
+        $email = $request->firebaseUser->email;
+        $obUserEmail = EntityUser::getUserByEmail($email);
+        if ($obUserEmail instanceof EntityUser) {
+            $request->user = $obUserEmail;
+        }
+        return true;
+    }
+
     private function getFirebaseAuthUser($request)
     {
         //INICIA A INSTÂNCIA DO FIREBASE
@@ -31,14 +43,23 @@ class FirebaseAuth
         //TOKEN PURO
         $token = isset($headers['Authorization']) ? str_replace('Bearer ', '', $headers['Authorization']) : '';
 
+        $this->logger->debug('Iniciando verificação do token');
+
         try {
+            /**
+             * @var \Kreait\Firebase\JWT\Token\Plain $verifiedToken //Tem que deixar isso aqui senão minha IDE fica acusando que o método claims() não existe
+             */
             $verifiedToken = $auth->verifyIdToken($token);
         } catch (Exception $e) {
             throw new Exception("Token inválido", 400);
         }
 
-        $uid = $verifiedToken->headers()->get('sub');
+        $this->logger->debug('Obtendo UID do usuário');
+
+        $uid = $verifiedToken->claims()->get('sub');
         $user = $auth->getUser($uid);
+
+        $this->logger->debug("Usuário obtido | Email: {$user->email}");
         return $user;
     }
 
@@ -46,7 +67,8 @@ class FirebaseAuth
     {
         //VERIFICA O USUÁRIO RECEBIDO
         if ($obUser = $this->getFirebaseAuthUser($request)) {
-            $request->user = $obUser;
+            $request->firebaseUser = $obUser;
+            $this->injectLocalUser($request);
             return true;
         }
 
@@ -64,6 +86,7 @@ class FirebaseAuth
      */
     public function handle($request, $next)
     {
+        $this->logger = new Logger('FirebaseAuthMiddleware');
         $this->auth($request);
 
         //EXECUTA O PRÓXIMO NÍVEL DO MIDDLEWARE

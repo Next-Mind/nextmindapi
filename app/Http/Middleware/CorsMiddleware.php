@@ -7,10 +7,11 @@ use App\Utils\Logger\Logger;
 class CorsMiddleware
 {
 
-    private Logger $logger = new Logger('CorsMiddleware');
+    private Logger $logger;
 
     public function handle($request, $next)
     {
+        $this->logger = new Logger('CorsMiddleware');
         //CONFIGURAÇÕES DEFINIDAS NO .env
         $allowedOrigins = getenv('CORS_ALLOWED_ORIGINS') ?: '*';
         $allowedMethods = getenv('CORS_ALLOWED_METHODS') ?: 'GET, POST, PUT, DELETE, OPTIONS';

@@ -7,7 +7,7 @@ use App\Utils\Logger\Logger;
 class Api
 {
 
-    private Logger $logger = new Logger('ApiMiddleware');
+    private Logger $logger;
 
     /**
      * Método responsável por executar o middleware
@@ -18,6 +18,7 @@ class Api
      */
     public function handle($request, $next)
     {
+        $this->logger = new Logger('ApiMiddleware');
         $this->logger->debug('Middleware raiz da API acionado.');
         //ALTERA O CONTENT TYPE PARA JSON
         $request->getRouter()->setContentType('application/json');
