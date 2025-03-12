@@ -160,21 +160,21 @@ class User
      *
      * @var bool
      */
-    public $perfil_completo = false;
+    public bool $perfil_completo = false;
 
     /**
      * Variável que identifica se o usuário respondeu o formulário obrigatório ou não
      *
      * @var bool
      */
-    public $questionario_respondido = false;
+    public bool $questionario_respondido = false;
 
     /**
      * Variável que identifica se o usuário respondeu o formulário obrigatório ou não
      *
      * @var bool
      */
-    public $cadastro_completo = false;
+    public bool $cadastro_completo = false;
 
     /**
      * Método responsável por cadastrar a instãncia atual de usuário no banco de dados
