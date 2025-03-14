@@ -11,56 +11,56 @@ class UserAnswer
      *
      * @var int
      */
-    public $id;
+    public int $id;
 
     /**
      * ID do usuário que respondeu
      *
      * @var int
      */
-    public $usuario_id;
+    public int $user_id;
 
     /**
      * ID da questão
      *
      * @var string
      */
-    public $questao_id;
+    public string $question_id;
 
     /**
      * Resposta do usuário
      *
      * @var string
      */
-    public $resposta;
+    public string $answer;
 
     /**
      * Data de cadastro da resposta no banco
      *
      * @var string
      */
-    public $data_cadastro;
+    public string $created_at;
 
     /**
      * Data de atualização da resposta no banco
      *
      * @var string
      */
-    public $data_atualizacao;
+    public string $updated_at;
 
     /**
      * Método responsável por cadastrar a instãncia atual de resposta no banco de dados
      *
      * @return boolean
      */
-    public function cadastrar()
+    public function register()
     {
-        $this->id = (new Database('usuarios_resposta_questionario'))->insert([
-            'usuario_id' => $this->usuario_id,
-            'questao_id' => $this->questao_id,
-            'resposta' => $this->resposta,
-            'data_cadastro' => (new \Datetime())->format('Y-m-d H:i:s'),
-            'data_atualizacao' => (new \Datetime())->format('Y-m-d H:i:s')
+        $this->id = (new Database('users_questionnaire_answers'))->insert([
+            'user_id' => $this->user_id,
+            'question_id' => $this->question_id,
+            'answer' => $this->answer,
+            'created_at' => (new \Datetime())->format('Y-m-d H:i:s'),
+            'updated_at' => (new \Datetime())->format('Y-m-d H:i:s')
         ]);
 
         //SUCESSO
@@ -72,14 +72,14 @@ class UserAnswer
      *
      * @return boolean
      */
-    public function atualizar()
+    public function update()
     {
-        return (new Database('usuarios_resposta_questionario'))->update('id= ' . $this->id, [
-            'usuario_id' => $this->usuario_id,
-            'questao_id' => $this->questao_id,
-            'resposta' => $this->resposta,
-            'data_cadastro' => $this->data_cadastro,
-            'data_atualizacao' => (new \Datetime())->format('Y-m-d H:i:s')
+        return (new Database('users_questionnaire_answers'))->update('id= ' . $this->id, [
+            'user_id' => $this->user_id,
+            'question_id' => $this->question_id,
+            'answer' => $this->answer,
+            'created_at' => $this->created_at,
+            'updated_at' => (new \Datetime())->format('Y-m-d H:i:s')
         ]);
     }
 }

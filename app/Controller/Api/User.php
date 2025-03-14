@@ -26,10 +26,10 @@ class User extends Api
      * @param  Request $request
      * @return array
      */
-    public static function setEditProfileUser($request)
+    public static function setEditLazyUser($request)
     {
         //CAMPOS OBRIGATÓRIOS
-        $requiredFields = ['user_type', 'name', 'birthDate', 'email', 'ra'];
+        $requiredFields = ['name', 'birthday', 'email', 'ra'];
 
         //VERIFICA SE HÁ OS DADOS DO USUÁRIO
         $postVars = $request->getPostVars();
@@ -39,8 +39,7 @@ class User extends Api
         }
 
         //ATUALIZA A INSTÃNCIA ATUAL DE USUÁRIO NO BANCO
-        $request->user->tipo_usuario_id = $user['user_type'];
-        $request->user->data_nascimento = $user['birthDate'];
+        $request->user->data_nascimento = $user['birthday'];
         $request->user->nome = $user['name'];
         $request->user->email = $user['email'];
         $request->user->ra = $user['ra'];
@@ -107,4 +106,45 @@ class User extends Api
             ]
         ], 201);
     }
+
+    public static function setEditAddressUser($request)
+    {
+        //POST VARS
+        $postVars = $request->getPostVars();
+
+        //CAMPOS OBRIGATÓRIOS
+        $requiredFields = ['address', 'addressNumber', 'zipCode', 'state'];
+        $address = $postVars['address'] ?? null;
+        if (!$address || array_diff_key(array_flip($requiredFields), $address)) {
+            throw new Exception('No required data found', 400);
+        }
+
+        if (!is_numeric($address['zipCode'])) {
+            throw new Exception('Zip Code must be numeric!');
+        }
+
+        //ATUALIZA A INSTÃNCIA ATUAL DE USUÁRIO NO BANCO
+        $request->user->logradouro = $address['address'];
+        $request->user->numero = $address['addressNumber'];
+        $request->user->cep = $address['zipCode'];
+        $request->user->estado = $address['state'];
+        $request->user->complemento = $address['addressComplement'] ?? '';
+        $request->user->atualizar();
+        return parent::getApiResponse('User address has been edited successfully', [
+            'user' => [
+                'uid' => $request->user->uid,
+                'id' => $request->user->id,
+                'name' => $request->user->nome,
+                'email' => $request->user->email,
+                'address' => $request->user->logradouro,
+                'addressNumber' => $request->user->numero,
+                'zipCode' => $request->user->cep,
+                'state' => $request->user->estado,
+                'addressComplement' => $request->user->complemento,
+                'complete_registration' => (bool) $request->user->cadastro_completo
+            ]
+        ]);
+    }
+
+    public static function setEditPersonalUserInfo($request) {}
 }

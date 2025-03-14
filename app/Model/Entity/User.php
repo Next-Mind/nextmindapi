@@ -4,8 +4,6 @@ namespace App\Model\Entity;
 
 use \WilliamCosta\DatabaseManager\Database;
 
-use \JsonSerializable;
-
 class User
 {
     /**
@@ -27,14 +25,14 @@ class User
      *
      * @var int
      */
-    public $tipo_usuario_id = 1;
+    public $user_type_id = 1;
 
     /**
      * Nome do usuário
      *
      * @var string
      */
-    public $nome = '';
+    public $name = '';
 
     /**
      * E-mail do usuário
@@ -48,7 +46,7 @@ class User
      *
      * @var string
      */
-    public $data_nascimento = '1990-01-01 00:00:00';
+    public $birth_date = '1990-01-01 00:00:00';
 
     /**
      * CPF do usuário
@@ -76,138 +74,130 @@ class User
      *
      * @var string
      */
-    public $fone1 = '';
+    public $phone1 = '';
 
     /**
      * Telefone secundário de contato do usuário
      *
      * @var string
      */
-    public $fone2 = '';
+    public $phone2 = '';
 
     /**
      * Logradouro (endereço) do usuário
      *
      * @var string
      */
-    public $logradouro = '';
+    public $address_street = '';
 
     /**
      * Número do endereço do usuário
      *
      * @var string
      */
-    public $numero = '';
+    public $address_number = '';
 
     /**
      * Complemento do endereço do usuário
      *
      * @var string
      */
-    public $complemento = '';
+    public $address_complement = '';
 
     /**
      * CEP do endereço do usuário
      *
      * @var string
      */
-    public $cep = '';
+    public $zip_code = '';
 
     /**
      * Estado do endereço do usuário
      *
      * @var string
      */
-    public $estado = '';
+    public $state = '';
 
     /**
      * Link para a imagem de perfil do usuário
      *
      * @var string
      */
-    public $imagem_perfil = '';
+    public $profile_image = '';
 
     /**
      * Descrição breve sobre o usuário
      *
      * @var string
      */
-    public $descricao = '';
+    public $profile_description = '';
 
     /**
      * Situação do usuário (ativo ou inativo)
      *
      * @var int
      */
-    public $situacao = 1;
+    public $status = 1;
 
     /**
      * Data do último acesso do usuário na plataforma
      *
      * @var string
      */
-    public $data_ultimo_acesso = '';
+    public $last_access_date = '';
 
     /**
      * Data de cadastro do usuário no sistema
      *
      * @var string
      */
-    public $data_cadastro = '';
+    public $registration_date = '';
 
     /**
      * Variável que identifica se o cadastro do usuário está completo ou não
      *
      * @var bool
      */
-    public bool $perfil_completo = false;
+    public bool $profile_complete = false;
 
     /**
      * Variável que identifica se o usuário respondeu o formulário obrigatório ou não
      *
      * @var bool
      */
-    public bool $questionario_respondido = false;
-
-    /**
-     * Variável que identifica se o usuário respondeu o formulário obrigatório ou não
-     *
-     * @var bool
-     */
-    public bool $cadastro_completo = false;
+    public bool $questionnaire_answered = false;
 
     /**
      * Método responsável por cadastrar a instãncia atual de usuário no banco de dados
      *
      * @return boolean
      */
-    public function cadastrar()
+    public function register()
     {
         //INSERE A INSTANCIA ATUAL NO BANCO DE DADOS
-        $this->id = (int) (new Database('usuarios'))->insert([
+        $this->id = (int) (new Database('users'))->insert([
             'uid' => $this->uid,
-            'tipo_usuario_id' => $this->tipo_usuario_id,
-            'nome' => $this->nome,
+            'user_type_id' => $this->user_type_id,
+            'name' => $this->name,
             'email' => $this->email,
-            'data_nascimento' => $this->data_nascimento,
+            'birth_date' => $this->birth_date,
             'cpf' => $this->cpf,
             'ra' => $this->ra,
             'crp' => $this->crp,
-            'fone1' => $this->fone1,
-            'fone2' => $this->fone2,
-            'logradouro' => $this->logradouro,
-            'numero' => $this->numero,
-            'complemento' => $this->complemento,
-            'cep' => $this->cep,
-            'estado' => $this->estado,
-            'imagem_perfil' => $this->imagem_perfil,
-            'descricao' => $this->descricao,
-            'situacao' => $this->situacao,
-            'data_ultimo_acesso' => (new \Datetime())->format('Y-m-d H:i:s'),
-            'data_cadastro' => (new \Datetime())->format('Y-m-d H:i:s'),
-            'perfil_completo' => (int) $this->perfil_completo,
-            'questionario_respondido' => (int) $this->questionario_respondido,
-            'cadastro_completo' => (int) $this->cadastro_completo
+            'phone1' => $this->phone1,
+            'phone2' => $this->phone2,
+            'address_street' => $this->address_street,
+            'address_number' => $this->address_number,
+            'address_complement' => $this->address_complement,
+            'zip_code' => $this->zip_code,
+            'state' => $this->state,
+            'profile_image' => $this->profile_image,
+            'profile_description' => $this->profile_description,
+            'status' => $this->status,
+            'last_access_date' => (new \Datetime())->format('Y-m-d H:i:s'),
+            'registration_date' => (new \Datetime())->format('Y-m-d H:i:s'),
+            'profile_complete' => (int) $this->profile_complete,
+            'questionnaire_answered' => (int) $this->questionnaire_answered,
         ]);
 
         //SUCESSO
@@ -219,33 +209,32 @@ class User
      *
      * @return boolean
      */
-    public function atualizar()
+    public function update()
     {
         //INSERE A INSTANCIA ATUAL NO BANCO DE DADOS
-        return (new Database('usuarios'))->update('id= ' . $this->id, [
+        return (new Database('users'))->update('id= ' . $this->id, [
             'uid' => $this->uid,
-            'tipo_usuario_id' => $this->tipo_usuario_id,
-            'nome' => $this->nome,
+            'user_type_id' => $this->user_type_id,
+            'name' => $this->name,
             'email' => $this->email,
-            'data_nascimento' => $this->data_nascimento,
+            'birth_date' => $this->birth_date,
             'cpf' => $this->cpf,
             'ra' => $this->ra,
             'crp' => $this->crp,
-            'fone1' => $this->fone1,
-            'fone2' => $this->fone2,
-            'logradouro' => $this->logradouro,
-            'numero' => $this->numero,
-            'complemento' => $this->complemento,
-            'cep' => $this->cep,
-            'estado' => $this->estado,
-            'imagem_perfil' => $this->imagem_perfil,
-            'descricao' => $this->descricao,
-            'situacao' => $this->situacao,
-            'data_ultimo_acesso' => $this->data_ultimo_acesso,
-            'data_cadastro' => (new \Datetime())->format('Y-m-d H:i:s'),
-            'perfil_completo' => (int) $this->perfil_completo,
-            'questionario_respondido' => (int) $this->questionario_respondido,
-            'cadastro_completo' => (int) $this->cadastro_completo
+            'phone1' => $this->phone1,
+            'phone2' => $this->phone2,
+            'address_street' => $this->address_street,
+            'address_number' => $this->address_number,
+            'address_complement' => $this->address_complement,
+            'zip_code' => $this->zip_code,
+            'state' => $this->state,
+            'profile_image' => $this->profile_image,
+            'profile_description' => $this->profile_description,
+            'status' => $this->status,
+            'last_access_date' => $this->last_access_date,
+            'registration_date' => (new \Datetime())->format('Y-m-d H:i:s'),
+            'profile_complete' => (int) $this->profile_complete,
+            'questionnaire_answered' => (int) $this->questionnaire_answered,
         ]);
     }
 
@@ -254,10 +243,10 @@ class User
      *
      * @return boolean
      */
-    public function inativar()
+    public function inactivate()
     {
-        return (new Database('usuarios'))->update('uid = ' . $this->uid, [
-            'situacao' => 0
+        return (new Database('users'))->update('uid = ' . $this->uid, [
+            'status' => 0
         ]);
     }
 
@@ -266,10 +255,10 @@ class User
      *
      * @return boolean
      */
-    public function ativar()
+    public function activate()
     {
-        return (new Database('usuarios'))->update('uid = ' . $this->uid, [
-            'situacao' => 1
+        return (new Database('users'))->update('uid = ' . $this->uid, [
+            'status' => 1
         ]);
     }
 
@@ -317,6 +306,6 @@ class User
      */
     public static function getUsers($where = null, $order = null, $limit = null, $fields = '*')
     {
-        return (new Database('usuarios'))->select($where, $order, $limit, $fields);
+        return (new Database('users'))->select($where, $order, $limit, $fields);
     }
 }

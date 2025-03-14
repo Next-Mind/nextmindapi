@@ -4,87 +4,92 @@ namespace App\Model\Entity;
 
 use \WilliamCosta\DatabaseManager\Database;
 
-class UserTypes {    
+class UserTypes
+{
     /**
      * ID do registro
      *
      * @var integer
      */
-    public $id;    
+    public int $id;
     /**
      * Nome do tipo de usuário
      *
      * @var string
      */
-    public $nome;    
+    public string $name;
     /**
      * Descrição do tipo de usuário
      *
      * @var string
      */
-    public $descricao;
-    
+    public string $description;
+
     /**
      * Situação (1 - ativo | 0 - inativo) do registro
      *
-     * @var boolean
+     * @var bool
      */
-    public $situacao;
-    
+    public bool $status;
+
     /**
      * Cadastra a instância atual no banco de dados
      *
-     * @return boolean
+     * @return bool
      */
-    public function cadastrar(){
-        $this->id = (new Database('tipos_usuarios'))->insert([
-            'nome' => $this->nome,
-            'descricao' => $this->descricao
+    public function register()
+    {
+        $this->id = (new Database('user_types'))->insert([
+            'name' => $this->name,
+            'description' => $this->description
         ]);
 
         //SUCESSO
         return true;
     }
-    
+
     /**
      * Atualiza o registro no banco com a instância atual
      *
-     * @return boolean
+     * @return bool
      */
-    public function atualizar(){
-        return (new Database('tipos_usuarios'))->update('id = '.$this->id,[
-            'nome' => $this->nome,
-            'descricao' => $this->descricao,
-            'situacao' => $this->situacao
+    public function update()
+    {
+        return (new Database('user_types'))->update('id = ' . $this->id, [
+            'name' => $this->name,
+            'description' => $this->description,
+            'status' => $this->status
         ]);
     }
-    
+
     /**
      * Inativa o registro no banco com a instância atual
      *
-     * @return boolean
+     * @return bool
      */
-    public function inativar(){
-        return (new Database('tipos_usuarios'))->update('id = '.$this->id,[
-            'situacao' => $this->situacao
+    public function inactivate()
+    {
+        return (new Database('user_types'))->update('id = ' . $this->id, [
+            'status' => $this->status
         ]);
     }
-    
+
     /**
      * Método responsável por retornar um tipo de usuário baseado no seu ID
      *
      * @param  integer $id
      * @return UserTypes
      */
-    public static function getUserTypeById($id) {
-        return self::getUserTypes('id = '.$id)->fetchObject(self::class);
+    public static function getUserTypeById($id)
+    {
+        return self::getUserTypes('id = ' . $id)->fetchObject(self::class);
     }
 
-    public static function getUserTypeByName($name){
-        return self::getUserTypes('nome = "'.$name.'"')->fetchObject(self::class);
-
+    public static function getUserTypeByName($name)
+    {
+        return self::getUserTypes('name = "' . $name . '"')->fetchObject(self::class);
     }
-    
+
     /**
      * Método responsável por retornar tipos de usuários
      *
@@ -94,7 +99,8 @@ class UserTypes {
      * @param  string $fields
      * @return PDOStatement
      */
-    public static function getUserTypes($where = null, $order = null, $limit = null, $fields = '*'){
-        return (new Database('tipos_usuarios'))->select($where,$order,$limit,$fields);
+    public static function getUserTypes($where = null, $order = null, $limit = null, $fields = '*')
+    {
+        return (new Database('user_types'))->select($where, $order, $limit, $fields);
     }
 }

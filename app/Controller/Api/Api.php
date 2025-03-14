@@ -13,11 +13,11 @@ class Api
      */
     public static function getDetails($request)
     {
-        return [
+        return self::getApiResponse('Success', [
             'nome' => 'API - NextMind',
             'versao' => 'v1.0.0',
             'autor' => 'Andre Custodio'
-        ];
+        ]);
     }
 
     /**
@@ -56,8 +56,8 @@ class Api
 
         //RETORNO
         return [
-            'paginaAtual' => isset($queryParams['page']) ? (int)$queryParams['page'] : 1,
-            'quantidadePaginas' => !empty($pages) ? count($pages) : 1
+            'current_page' => isset($queryParams['page']) ? (int)$queryParams['page'] : 1,
+            'pages_length' => !empty($pages) ? count($pages) : 1
         ];
     }
 }

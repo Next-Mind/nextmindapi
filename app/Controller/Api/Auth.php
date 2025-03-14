@@ -39,11 +39,10 @@ class Auth extends Api
             'user' => [
                 'uid' => $obUser->uid,
                 'id' => $obUser->id,
-                'name' => $obUser->nome,
+                'name' => $obUser->name,
                 'email' => $obUser->email,
-                'questionnaire_answered' => (bool) $obUser->questionario_respondido,
-                'complete_profile' => (bool) $obUser->perfil_completo,
-                'complete_registration' => (bool) $obUser->cadastro_completo
+                'questionnaire_answered' => (bool) $obUser->questionnaire_answered,
+                'complete_profile' => (bool) $obUser->profile_complete,
             ]
         ], 200);
     }
@@ -68,22 +67,20 @@ class Auth extends Api
         //NOVO USUÁRIO
         $obUser = new EntityUser;
         $obUser->uid = $user->uid;
-        $obUser->nome = $user->displayName;
+        $obUser->name = $user->displayName;
         $obUser->email = $user->email;
-        $obUser->perfil_completo = 0;
-        $obUser->questionario_respondido = 0;
-        $obUser->cadastro_completo = 0;
-        $obUser->cadastrar();
+        $obUser->profile_complete = 0;
+        $obUser->questionnaire_answered = 0;
+        $obUser->register();
 
         $response = [
             'user' => [
                 'uid' => $obUser->uid,
                 'id' => $obUser->id,
-                'name' => $obUser->nome,
+                'name' => $obUser->name,
                 'email' => $obUser->email,
-                'questionnaire_answered' => (bool) $obUser->questionario_respondido,
-                'complete_profile' => (bool) $obUser->perfil_completo,
-                'complete_registration' => (bool) $obUser->cadastro_completo
+                'questionnaire_answered' => (bool) $obUser->questionnaire_answered,
+                'complete_profile' => (bool) $obUser->profile_complete
             ]
         ];
 
