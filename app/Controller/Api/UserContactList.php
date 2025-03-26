@@ -2,8 +2,8 @@
 
 namespace App\Controller\Api;
 
-use \App\Model\Entity\UserContactList as EntityUserContactList;
-use \App\Model\Entity\User as EntityUser;
+use \App\Model\Entity\Users\UserContactList as EntityUserContactList;
+use \App\Model\Entity\Users\User as EntityUser;
 use Exception;
 use \WilliamCosta\DatabaseManager\Pagination;
 

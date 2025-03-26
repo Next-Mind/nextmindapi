@@ -2,7 +2,7 @@
 
 namespace App\Controller\Api;
 
-use App\Model\Entity\UserAnswer;
+use App\Model\Entity\Users\UserAnswer;
 use Exception;
 
 class User extends Api
@@ -29,7 +29,7 @@ class User extends Api
     public static function setEditLazyUser($request)
     {
         //CAMPOS OBRIGATÓRIOS
-        $requiredFields = ['name', 'birthday', 'email', 'ra'];
+        $requiredFields = ['name', 'birth_date', 'email', 'ra'];
 
         //VERIFICA SE HÁ OS DADOS DO USUÁRIO
         $postVars = $request->getPostVars();
@@ -83,10 +83,10 @@ class User extends Api
         //ITERA SOBRE CADA PERGUNTA, SENDO $PERGUNTA => $RESPOSTA, E CADASTRA NO BANCO
         foreach ($questionnaire as $question => $answer) {
             $obUserAnswer = new UserAnswer();
-            $obUserAnswer->usuario_id = $request->user->id;
-            $obUserAnswer->questao_id = $question;
-            $obUserAnswer->resposta = $answer;
-            $obUserAnswer->cadastrar();
+            $obUserAnswer->user_id = $request->user->id;
+            $obUserAnswer->question_id = $question;
+            $obUserAnswer->answer = $answer;
+            $obUserAnswer->register();
         }
 
         //ATUALIZA O CADASTRO DO USUÁRIO, INFORMANDO QUE O QUESTIONÁRIO FOI RESPONDIDO
@@ -98,11 +98,10 @@ class User extends Api
             'user' => [
                 'uid' => $request->user->uid,
                 'id' => $request->user->id,
-                'name' => $request->user->nome,
+                'name' => $request->user->name,
                 'email' => $request->user->email,
-                'questionnaire_answered' => (bool) $request->user->questionario_respondido,
-                'complete_profile' => (bool) $request->user->perfil_completo,
-                'complete_registration' => (bool) $request->user->cadastro_completo
+                'questionnaire_answered' => (bool) $request->user->questionnaire_answered,
+                'complete_registration' => (bool) $request->user->complete_profile
             ]
         ], 201);
     }

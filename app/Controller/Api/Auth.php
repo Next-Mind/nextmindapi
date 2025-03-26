@@ -3,7 +3,7 @@
 namespace App\Controller\Api;
 
 use Exception;
-use \App\Model\Entity\User as EntityUser;
+use \App\Model\Entity\Users\User as EntityUser;
 
 class Auth extends Api
 {
@@ -32,7 +32,7 @@ class Auth extends Api
         $obUser = $request->user;
 
         $obUser->data_ultimo_acesso = Date('Y-m-d H:i:s');
-        $obUser->atualizar();
+        $obUser->update();
 
 
         return parent::getApiResponse('User authenticated successfully', [

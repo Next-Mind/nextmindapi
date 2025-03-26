@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use \App\Model\Entity\User;
+use \App\Model\Entity\Users\User;
 use App\Utils\Logger\Logger;
 use Exception;
 use \Firebase\JWT\JWT;

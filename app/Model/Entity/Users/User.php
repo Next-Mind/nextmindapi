@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model\Entity;
+namespace App\Model\Entity\Users;
 
 use \WilliamCosta\DatabaseManager\Database;
 
@@ -144,14 +144,21 @@ class User
      *
      * @var string
      */
-    public $last_access_date = '';
+    public $last_login = '';
 
     /**
      * Data de cadastro do usuário no sistema
      *
      * @var string
      */
-    public $registration_date = '';
+    public $created_at = '';
+
+    /**
+     * Data em que o usuário atualizou seus dados no sistema
+     *
+     * @var string
+     */
+    public $updated_at = '';
 
     /**
      * Variável que identifica se o cadastro do usuário está completo ou não
@@ -194,8 +201,8 @@ class User
             'profile_image' => $this->profile_image,
             'profile_description' => $this->profile_description,
             'status' => $this->status,
-            'last_access_date' => (new \Datetime())->format('Y-m-d H:i:s'),
-            'registration_date' => (new \Datetime())->format('Y-m-d H:i:s'),
+            'last_login' => (new \Datetime())->format('Y-m-d H:i:s'),
+            'created_at' => (new \Datetime())->format('Y-m-d H:i:s'),
             'profile_complete' => (int) $this->profile_complete,
             'questionnaire_answered' => (int) $this->questionnaire_answered,
         ]);
@@ -231,8 +238,8 @@ class User
             'profile_image' => $this->profile_image,
             'profile_description' => $this->profile_description,
             'status' => $this->status,
-            'last_access_date' => $this->last_access_date,
-            'registration_date' => (new \Datetime())->format('Y-m-d H:i:s'),
+            'last_login' => $this->last_login,
+            'created_at' => (new \Datetime())->format('Y-m-d H:i:s'),
             'profile_complete' => (int) $this->profile_complete,
             'questionnaire_answered' => (int) $this->questionnaire_answered,
         ]);

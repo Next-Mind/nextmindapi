@@ -48,9 +48,7 @@ MiddlewareQueue::setMap([
 //DEFINE O MAPEAMENTO DE MIDDLEWARES PADRÕES EXECUTADOS EM TODAS AS ROTAS
 MiddlewareQueue::setDefault([
     'allow-cors',
-    'api',
     'maintenance',
-    'firebase-auth'
 ]);
 
 //DEFINE O CAMINHO E O NOME DO ARQUIVO COM AS CHAVES PRIVADAS DO FIREBASE

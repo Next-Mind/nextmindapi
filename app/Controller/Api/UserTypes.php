@@ -2,8 +2,7 @@
 
 namespace App\Controller\Api;
 
-use \App\Model\Entity\UserTypes as EntityUserTypes;
-use Exception;
+use \App\Model\Entity\Users\UserTypes as EntityUserTypes;
 use \WilliamCosta\DatabaseManager\Pagination;
 
 class UserTypes extends Api

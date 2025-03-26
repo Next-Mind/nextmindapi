@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Kreait\Firebase\Factory;
 
 use \App\Utils\Logger\Logger;
-use \App\Model\Entity\User as EntityUser;
+use \App\Model\Entity\Users\User as EntityUser;
 
 use \Exception;
 
