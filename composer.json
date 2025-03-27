@@ -10,6 +10,12 @@
         "william-costa/database-manager": "^0.1.0",
         "firebase/php-jwt": "^6.10",
         "kreait/firebase-php": "^5.26",
-        "cboden/ratchet": "^0.4.4"
+        "cboden/ratchet": "^0.4.4",
+        "phpdocumentor/shim": "^3.7"
+    },
+    "config": {
+        "allow-plugins": {
+            "phpdocumentor/shim": true
+        }
     }
 }
