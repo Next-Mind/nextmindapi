@@ -17,7 +17,7 @@ class User extends Api
     public static function getCurrentUser($request)
     {
 
-        return parent::getApiResponse('Success', $request->user);
+        return parent::getApiResponse('Successfully retrieved user data', ["user" => $request->user]);
     }
 
     /**
@@ -39,25 +39,25 @@ class User extends Api
         }
 
         //ATUALIZA A INSTÃNCIA ATUAL DE USUÁRIO NO BANCO
-        $request->user->data_nascimento = $user['birthday'];
-        $request->user->nome = $user['name'];
+        $request->user->birth_date = $user['birth_date'];
+        $request->user->name = $user['name'];
         $request->user->email = $user['email'];
         $request->user->ra = $user['ra'];
-        $request->user->perfil_completo = 1;
-        $request->user->atualizar();
+        $request->user->updated_at = (new \DateTime())->format('Y-m-d H:i:s');
+        $request->user->update();
 
         //SUCESSO
         return parent::getApiResponse('User profile has been edited successfully', [
             'user' => [
                 'uid' => $request->user->uid,
                 'id' => $request->user->id,
-                'name' => $request->user->nome,
+                'name' => $request->user->name,
                 'email' => $request->user->email,
-                'questionnaire_answered' => (bool) $request->user->questionario_respondido,
-                'complete_profile' => (bool) $request->user->perfil_completo,
-                'complete_registration' => (bool) $request->user->cadastro_completo
+                'questionnaire_answered' => (bool) $request->user->questionnaire_answered,
+                'personal_info_complete' => (bool) $request->user->personal_info_complete,
+                'address_complete' => (bool) $request->user->address_complete
             ]
-        ]);
+        ], 201);
     }
 
     /**
@@ -77,7 +77,8 @@ class User extends Api
             throw new Exception('No required data found', 400);
         }
 
-        if ($request->user->questionario_respondido) {
+        if ($request->user->questionnaire_answered) {
+            throw new Exception('Questionnaire already answered', 409);
         }
 
         //ITERA SOBRE CADA PERGUNTA, SENDO $PERGUNTA => $RESPOSTA, E CADASTRA NO BANCO
@@ -90,8 +91,9 @@ class User extends Api
         }
 
         //ATUALIZA O CADASTRO DO USUÁRIO, INFORMANDO QUE O QUESTIONÁRIO FOI RESPONDIDO
-        $request->user->questionario_respondido = 1;
-        $request->user->atualizar();
+        $request->user->questionnaire_answered = 1;
+        $request->user->updated_at = (new \DateTime())->format('Y-m-d H:i:s');
+        $request->user->update();
 
         //SUCESSO
         return parent::getApiResponse('The questionnaire was successfully registered', [
@@ -101,49 +103,132 @@ class User extends Api
                 'name' => $request->user->name,
                 'email' => $request->user->email,
                 'questionnaire_answered' => (bool) $request->user->questionnaire_answered,
-                'complete_registration' => (bool) $request->user->complete_profile
+                'personal_info_complete' => (bool) $request->user->personal_info_complete,
+                'address_complete' => (bool) $request->user->address_complete
             ]
         ], 201);
     }
 
+    /**
+     * Método responsável por editar o endereço do usuário atualmente logado
+     *
+     * @param  Request $request
+     * @return array
+     */
     public static function setEditAddressUser($request)
     {
         //POST VARS
         $postVars = $request->getPostVars();
 
         //CAMPOS OBRIGATÓRIOS
-        $requiredFields = ['address', 'addressNumber', 'zipCode', 'state'];
+        $requiredFields = ['address_street', 'address_number', 'zip_code', 'state'];
         $address = $postVars['address'] ?? null;
         if (!$address || array_diff_key(array_flip($requiredFields), $address)) {
             throw new Exception('No required data found', 400);
         }
 
-        if (!is_numeric($address['zipCode'])) {
+        if (!is_numeric($address['zip_code'])) {
             throw new Exception('Zip Code must be numeric!');
         }
 
         //ATUALIZA A INSTÃNCIA ATUAL DE USUÁRIO NO BANCO
-        $request->user->logradouro = $address['address'];
-        $request->user->numero = $address['addressNumber'];
-        $request->user->cep = $address['zipCode'];
-        $request->user->estado = $address['state'];
-        $request->user->complemento = $address['addressComplement'] ?? '';
-        $request->user->atualizar();
+        $request->user->address_street = $address['address_street'];
+        $request->user->address_number = $address['address_number'];
+        $request->user->zip_code = $address['zip_code'];
+        $request->user->state = $address['state'];
+        $request->user->address_complement = $address['address_complement'] ?? '';
+        $request->user->address_complete = true;
+        $request->user->updated_at = (new \DateTime())->format('Y-m-d H:i:s');
+        $request->user->update();
         return parent::getApiResponse('User address has been edited successfully', [
             'user' => [
                 'uid' => $request->user->uid,
                 'id' => $request->user->id,
-                'name' => $request->user->nome,
+                'name' => $request->user->name,
                 'email' => $request->user->email,
-                'address' => $request->user->logradouro,
-                'addressNumber' => $request->user->numero,
-                'zipCode' => $request->user->cep,
-                'state' => $request->user->estado,
-                'addressComplement' => $request->user->complemento,
-                'complete_registration' => (bool) $request->user->cadastro_completo
+                'address' => $request->user->address_street,
+                'address_number' => $request->user->address_number,
+                'zip_code' => $request->user->zip_code,
+                'state' => $request->user->state,
+                'address_complement' => $request->user->address_complement,
+                'questionnaire_answered' => (bool) $request->user->questionnaire_answered,
+                'personal_info_complete' => (bool) $request->user->personal_info_complete,
+                'address_complete' => (bool) $request->user->address_complete
             ]
         ]);
     }
 
-    public static function setEditPersonalUserInfo($request) {}
+    /**
+     * Método responsável por editar as informações pessoais do usuário, voltadas para o uso no agendamento de consultas
+     *
+     * @param  Request $request
+     * @return array
+     */
+    public static function setEditPersonalUserInfo($request)
+    {
+        //POST VARS
+        $postVars = $request->getPostVars();
+
+        //CAMPOS OBRIGATÓRIOS
+        $requiredFields = ['gender', 'cpf', 'phone1'];
+        $personal_info = $postVars['personal_info'] ?? null;
+        if (!$personal_info || array_diff_key(array_flip($requiredFields), $personal_info)) {
+            throw new Exception('No required data found', 400);
+        }
+
+        if (!is_numeric($personal_info['cpf']) || !is_numeric($personal_info['phone1']) || !is_numeric($personal_info['phone2'])) {
+            throw new Exception("'cpf', 'phone1' or 'phone2' must be numeric!");
+        }
+
+        $request->user->gender = $personal_info['gender'];
+        $request->user->cpf = $personal_info['cpf'];
+        $request->user->phone1 = $personal_info['phone1'];
+        $request->user->phone2 = $personal_info['phone2'];
+        $request->user->personal_info_complete = true;
+        $request->user->updated_at = (new \DateTime())->format('Y-m-d H:i:s');
+        $request->user->update();
+        return parent::getApiResponse('User address has been edited successfully', [
+            'user' => [
+                'uid' => $request->user->uid,
+                'id' => $request->user->id,
+                'name' => $request->user->name,
+                'email' => $request->user->email,
+                'gender' => $request->user->gender,
+                'cpf' => $request->user->cpf,
+                'phone1' => $request->user->phone1,
+                'phone2' => $request->user->phone2,
+                'questionnaire_answered' => (bool) $request->user->questionnaire_answered,
+                'personal_info_complete' => (bool) $request->user->personal_info_complete,
+                'address_complete' => (bool) $request->user->address_complete
+            ]
+        ]);
+    }
+
+    public static function setEditDescriptionProfileInfo($request)
+    {
+        //POST VARS
+        $postVars = $request->getPostVars();
+
+        //CAMPOS OBRIGATÓRIOS
+        if (!isset($postVars['description'])) {
+            throw new Exception('No required data found', 400);
+        }
+
+        $request->user->profile_description = $postVars['description'];
+        $request->user->updated_at = (new \DateTime())->format('Y-m-d H:i:s');
+        $request->user->update();
+
+        return parent::getApiResponse('User description has been edited successfully', [
+            'user' => [
+                'uid' => $request->user->uid,
+                'id' => $request->user->id,
+                'name' => $request->user->name,
+                'email' => $request->user->email,
+                'profile_description' => $request->user->profile_description,
+                'questionnaire_answered' => (bool) $request->user->questionnaire_answered,
+                'personal_info_complete' => (bool) $request->user->personal_info_complete,
+                'address_complete' => (bool) $request->user->address_complete
+            ]
+        ]);
+    }
 }

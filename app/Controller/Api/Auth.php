@@ -31,7 +31,7 @@ class Auth extends Api
     {
         $obUser = $request->user;
 
-        $obUser->data_ultimo_acesso = Date('Y-m-d H:i:s');
+        $obUser->last_login = Date('Y-m-d H:i:s');
         $obUser->update();
 
 
@@ -42,7 +42,8 @@ class Auth extends Api
                 'name' => $obUser->name,
                 'email' => $obUser->email,
                 'questionnaire_answered' => (bool) $obUser->questionnaire_answered,
-                'complete_profile' => (bool) $obUser->profile_complete,
+                'personal_info_complete' => (bool) $obUser->personal_info_complete,
+                'address_complete' => (bool) $obUser->address_complete,
             ]
         ], 200);
     }
@@ -69,8 +70,6 @@ class Auth extends Api
         $obUser->uid = $user->uid;
         $obUser->name = $user->displayName;
         $obUser->email = $user->email;
-        $obUser->profile_complete = 0;
-        $obUser->questionnaire_answered = 0;
         $obUser->register();
 
         $response = [
@@ -80,7 +79,8 @@ class Auth extends Api
                 'name' => $obUser->name,
                 'email' => $obUser->email,
                 'questionnaire_answered' => (bool) $obUser->questionnaire_answered,
-                'complete_profile' => (bool) $obUser->profile_complete
+                'personal_info_complete' => (bool) $obUser->personal_info_complete,
+                'address_complete' => (bool) $obUser->address_complete,
             ]
         ];
 

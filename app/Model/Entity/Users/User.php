@@ -49,6 +49,13 @@ class User
     public $birth_date = '1990-01-01 00:00:00';
 
     /**
+     * Gênero do usuário
+     *
+     * @var string
+     */
+    public $gender;
+
+    /**
      * CPF do usuário
      *
      * @var string
@@ -161,11 +168,18 @@ class User
     public $updated_at = '';
 
     /**
-     * Variável que identifica se o cadastro do usuário está completo ou não
+     * Variável que identifica se o cadastro de informações pessoais do usuário está completo ou não
      *
      * @var bool
      */
-    public bool $profile_complete = false;
+    public bool $personal_info_complete = false;
+
+    /**
+     * Variável que identifica se o cadastro do endereço do usuário está completo ou não
+     *
+     * @var bool
+     */
+    public bool $address_complete = false;
 
     /**
      * Variável que identifica se o usuário respondeu o formulário obrigatório ou não
@@ -188,6 +202,7 @@ class User
             'name' => $this->name,
             'email' => $this->email,
             'birth_date' => $this->birth_date,
+            'gender' => $this->gender,
             'cpf' => $this->cpf,
             'ra' => $this->ra,
             'crp' => $this->crp,
@@ -203,7 +218,9 @@ class User
             'status' => $this->status,
             'last_login' => (new \Datetime())->format('Y-m-d H:i:s'),
             'created_at' => (new \Datetime())->format('Y-m-d H:i:s'),
-            'profile_complete' => (int) $this->profile_complete,
+            'updated_at' => (new \Datetime())->format('Y-m-d H:i:s'),
+            'personal_info_complete' => (int) $this->personal_info_complete,
+            'address_complete' => (int) $this->address_complete,
             'questionnaire_answered' => (int) $this->questionnaire_answered,
         ]);
 
@@ -225,6 +242,7 @@ class User
             'name' => $this->name,
             'email' => $this->email,
             'birth_date' => $this->birth_date,
+            'gender' => $this->gender,
             'cpf' => $this->cpf,
             'ra' => $this->ra,
             'crp' => $this->crp,
@@ -239,8 +257,10 @@ class User
             'profile_description' => $this->profile_description,
             'status' => $this->status,
             'last_login' => $this->last_login,
-            'created_at' => (new \Datetime())->format('Y-m-d H:i:s'),
-            'profile_complete' => (int) $this->profile_complete,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'personal_info_complete' => (int) $this->personal_info_complete,
+            'address_complete' => (int) $this->address_complete,
             'questionnaire_answered' => (int) $this->questionnaire_answered,
         ]);
     }

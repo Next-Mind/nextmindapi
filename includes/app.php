@@ -49,6 +49,8 @@ MiddlewareQueue::setMap([
 MiddlewareQueue::setDefault([
     'allow-cors',
     'maintenance',
+    'api',
+    'firebase-auth'
 ]);
 
 //DEFINE O CAMINHO E O NOME DO ARQUIVO COM AS CHAVES PRIVADAS DO FIREBASE

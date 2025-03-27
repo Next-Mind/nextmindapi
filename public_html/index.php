@@ -12,8 +12,6 @@ $logger->debug('Iniciando objeto de router');
 $obRouter = new Router(URL);
 
 //INCLUI AS ROTAS DA API 
-include __DIR__ . '/../routes/test.php';
-
 include __DIR__ . '/../routes/api.php';
 
 

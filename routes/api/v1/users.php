@@ -39,3 +39,19 @@ $obRouter->put('/api/v1/users/me/address', [
         return new Response(201, Api\User::setEditAddressUser($request), 'application/json');
     }
 ]);
+
+//ROTA PARA ATUALIZAÇÃO DAS INFORMAÇÕES PESSOAIS DO USUÁRIO ATUALMENTE CONECTADO
+$obRouter->put('/api/v1/users/me/personal-info', [
+    'middlewares' => $usersMiddlewares,
+    function ($request) {
+        return new Response(201, Api\User::setEditPersonalUserInfo($request), 'application/json');
+    }
+]);
+
+//ROTA PARA ATUALIZAÇÃO DA DESCRIÇÃO (BIO) DO USUÁRIO ATUALMENTE CONECTADO
+$obRouter->put('/api/v1/users/me/profile-description', [
+    'middlewares' => $usersMiddlewares,
+    function ($request) {
+        return new Response(201, Api\User::setEditDescriptionProfileInfo($request), 'application/json');
+    }
+]);
