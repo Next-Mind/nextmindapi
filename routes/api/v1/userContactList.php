@@ -7,6 +7,14 @@ $userContactMiddlewares = [
     'requires-sign-in'
 ];
 
+//ROTA DE LISTAGEM DOS USUÁRIOS ELEGÍVEIS PARA ADICIONAR NA LISTA
+$obRouter->get('/api/v1/contacts/users', [
+    'middlewares' => $userContactMiddlewares,
+    function ($request) {
+        return new Response(200, Api\UserContactList::getEligibleUsersForContactList($request), 'application/json');
+    }
+]);
+
 //ROTA DE LISTAGEM DOS CONTATOS DO USUÁRIO
 $obRouter->get('/api/v1/contacts', [
     'middlewares' => $userContactMiddlewares,

@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use \App\Model\Entity\Users\UserContactList as EntityUserContactList;
 use \App\Model\Entity\Users\User as EntityUser;
+use Dom\Entity;
 use Exception;
 use \WilliamCosta\DatabaseManager\Pagination;
 
@@ -16,7 +17,7 @@ class UserContactList extends Api
      * @param Pagination $obPagination
      * @return string
      */
-    private static function getUserItems($request, &$obPagination)
+    private static function getContactUserItems($request, &$obPagination)
     {
         //Usuários
         $itens = [];
@@ -43,9 +44,57 @@ class UserContactList extends Api
             //USUÁRIOS
             $itens[] = [
                 'id' => $obUser->id,
-                'name' => $obUserContactList->nickname,
+                'uid' => $obUser->uid,
+                'name' => $obUser->name,
+                'nickname' => $obUserContactList->nickname,
                 'email' => $obUser->email,
-                'phone' => $obUser->phone1
+                'phone' => $obUser->phone1,
+                'profile_image' => $obUser->profile_image,
+            ];
+        }
+
+        //RETORNA OS USUÁRIOS DA LISTA
+        return $itens;
+    }
+
+    /**
+     * Método responsável por obter a renderização dos itens de usuários para a lista de contatos
+     * @param Request $request
+     * @param Pagination $obPagination
+     * @return string
+     */
+    private static function getEligibleUsersitems($request, &$obPagination)
+    {
+        //Usuários
+        $itens = [];
+
+        //QUANTIDADE TOTAL DE REGISTRO
+        $totalLength = EntityUser::getUsers('questionnaire_answered = 1 AND personal_info_complete = 1', null, null, 'COUNT(*) as qtd')->fetchObject()->qtd;
+
+        //PÁGINA ATUAL
+        $queryParams = $request->getQueryParams();
+        $paginaAtual = $queryParams['page'] ?? 1;
+
+        //QUANTIDADE POR PÁGINA
+        $qtdPagina = $queryParams['results'] ?? 5;
+
+        //INSTANCIA DE PAGINAÇÃO
+        $obPagination = new Pagination($totalLength, $paginaAtual, $qtdPagina);
+
+        //RESULTADOS DA PÁGINA
+        $results = EntityUser::getUsers('questionnaire_answered = 1 AND personal_info_complete = 1 AND id <> ' . $request->user->id, 'name ASC', $obPagination->getLimit());
+
+        //RENDERIZA O ITEM
+        while ($obUser = $results->fetchObject(EntityUser::class)) {
+            //USUÁRIOS
+            $itens[] = [
+                'id' => $obUser->id,
+                'uid' => $obUser->uid,
+                'name' => $obUser->name,
+                'email' => $obUser->email,
+                'phone' => $obUser->phone1,
+                'profile_image' => $obUser->profile_image,
+                'is_friend' => EntityUserContactList::isUserInContactList($request->user->id, $obUser->id) instanceof EntityUserContactList ? true : false
             ];
         }
 
@@ -62,7 +111,7 @@ class UserContactList extends Api
     public static function getUsersContactList($request)
     {
         return parent::getApiResponse('Successful return to contact list', [
-            'users' => self::getUserItems($request, $obPagination),
+            'users' => self::getContactUserItems($request, $obPagination),
             'pagination'   => parent::getPagination($request, $obPagination)
         ]);
     }
@@ -88,10 +137,6 @@ class UserContactList extends Api
             throw new Exception("The 'contact_id' field is required!", 400);
         }
 
-        if (!isset($postVars["nickname"])) {
-            throw new Exception("The 'nickname' field is required!", 400);
-        }
-
         //VALIDA SE O ID INFORMADO NO POST É IGUAL AO ID DO USUÁRIO LOGADO
         if ($request->user->id == $postVars["contact_id"]) {
             throw new Exception("You can't add yourself to your contact list!", 400);
@@ -113,7 +158,7 @@ class UserContactList extends Api
         $obUserContact = new EntityUserContactList();
         $obUserContact->user_id = $request->user->id;
         $obUserContact->contact_id = $postVars["contact_id"];
-        $obUserContact->nickname = $postVars["nickname"];
+        $obUserContact->nickname = $postVars["nickname"] ?? EntityUser::getUserById($postVars["contact_id"])->name;
         $obUserContact->register();
 
         return parent::getApiResponse('Successful in adding the user to the contact list', $obUserContact, 201);
@@ -164,18 +209,13 @@ class UserContactList extends Api
         //OBTÉM AS VARIÁVEIS DO POST
         $postVars = $request->getPostVars();
 
-        //VALIDA SE FOI DIGITADO UM NÚMERO
-        if (!is_numeric($postVars["user_id"])) {
-            throw new Exception("Please enter a valid number!", 400);
-        }
-
         //VALIDA CAMPOS OBRIGATÓRIOS
         if (!isset($postVars["contact_id"])) {
             throw new Exception("The 'contact_id' field is required!", 400);
         }
 
         if (!isset($postVars["nickname"])) {
-            throw new Exception("The nickname field is required!", 400);
+            throw new Exception("The 'nickname' field is required!", 400);
         }
 
         //VALIDA QUANTIDADE DE CARACTERES DIGITADOS PARA O nickname
@@ -193,5 +233,20 @@ class UserContactList extends Api
         $obUserContactList->update();
 
         return parent::getApiResponse('Successful in editing the contact', $obUserContactList);
+    }
+
+    /**
+     * Método responsável por retornar a lista de usuários elegíveis para adicionar como amigo
+     *
+     * @param  Request $request
+     * @return array
+     */
+    public static function getEligibleUsersForContactList($request)
+    {
+        $eligibleUsers = EntityUser::getUsers('questionnaire_answered = 1 AND personal_info_complete = 1');
+        return parent::getApiResponse('Successfully returned the list of users.', [
+            'users' => self::getEligibleUsersitems($request, $obPagination),
+            'pagination'   => parent::getPagination($request, $obPagination)
+        ]);
     }
 }

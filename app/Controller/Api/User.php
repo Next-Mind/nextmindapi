@@ -3,6 +3,8 @@
 namespace App\Controller\Api;
 
 use App\Model\Entity\Users\UserAnswer;
+use App\Model\Entity\Users\User as EntityUser;
+use Kreait\Firebase\Factory;
 use Exception;
 
 class User extends Api
@@ -37,6 +39,22 @@ class User extends Api
         if (!$user || array_diff_key(array_flip($requiredFields), $user)) {
             throw new Exception('No required data found', 400);
         }
+
+        //DEFININDO NOME PARA ATUALIZAR NO FIREBASE
+        $properties = [
+            'displayName' => $user['name']
+        ];
+
+        //OBTENDO UID DO USUÁRIO
+        $uid = $request->user->uid;
+
+        //INICIANDO INSTÃNCIA DO SDK FIREBASE
+        $firebase = (new Factory)
+            ->withServiceAccount(FIREBASE_KEY);
+        $auth = $firebase->createAuth();
+
+        //ATUALIZANDO O USUÁRIO
+        $auth->updateUser($uid, $properties);
 
         //ATUALIZA A INSTÃNCIA ATUAL DE USUÁRIO NO BANCO
         $request->user->birth_date = $user['birth_date'];
@@ -180,6 +198,13 @@ class User extends Api
             throw new Exception("'cpf', 'phone1' or 'phone2' must be numeric!");
         }
 
+        //VERIFICANDO SE NÃO HÁ OUTRO USUÁRIO COM O MESMO CPF
+        $obUserCpf = EntityUser::getUserByCpf($personal_info['cpf']);
+        if ($obUserCpf instanceof EntityUser) {
+            throw new Exception('This CPF is already in use by another person!', 400);
+        }
+
+        //ATUALIZA OS DADOS
         $request->user->gender = $personal_info['gender'];
         $request->user->cpf = $personal_info['cpf'];
         $request->user->phone1 = $personal_info['phone1'];

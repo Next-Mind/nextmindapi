@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use Exception;
 use \App\Model\Entity\Users\User as EntityUser;
+use Kreait\Firebase\Factory;
 
 class Auth extends Api
 {
@@ -58,6 +59,21 @@ class Auth extends Api
     {
         $user = $request->firebaseUser;
         $uid = $user->uid;
+
+        //SETAR NOME GENÉRIO, CASO NÃO TENHA
+        if (empty($request->firebaseUser->name)) {
+            //DEFININDO NOME GENÉRICO
+            $properties = [
+                'displayName' => 'New User'
+            ];
+            //INICIANDO INSTÃNCIA DO SDK FIREBASE
+            $firebase = (new Factory)
+                ->withServiceAccount(FIREBASE_KEY);
+            $auth = $firebase->createAuth();
+
+            //ATUALIZANDO E ATRIBUINDO O USUÁRIO
+            $user = $auth->updateUser($uid, $properties);
+        }
 
         //REALIZA BUSCA NO BANCO PARA VERIFICAR SE NÃO EXISTE ESTE USUÁRIO
         $obUserUid = EntityUser::getUserByUid($uid);

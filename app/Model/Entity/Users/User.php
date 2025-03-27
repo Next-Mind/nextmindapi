@@ -323,6 +323,17 @@ class User
     }
 
     /**
+     * Método responsável por retornar um usuário com base em seu cpf
+     *
+     * @param  string $email
+     * @return User
+     */
+    public static function getUserByCpf($cpf)
+    {
+        return self::getUsers('cpf ="' . $cpf . '"')->fetchObject(self::class);
+    }
+
+    /**
      * Método responsável por retornar Usuários
      *
      * @param  string $where
