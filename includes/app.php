@@ -41,7 +41,8 @@ MiddlewareQueue::setMap([
     'cache' => \App\Http\Middleware\Cache::class,
     'api-key-auth' => \App\Http\Middleware\ApiKeyAuth::class,
     'firebase-auth' => \App\Http\Middleware\FirebaseAuth::class,
-    'requires-sign-in' => \App\Http\Middleware\RequiresSignIn::class
+    'requires-sign-in' => \App\Http\Middleware\RequiresSignIn::class,
+    'requires-psychologist-permission' => \App\Http\Middleware\RequiresPyschoPerm::class,
 
 ]);
 

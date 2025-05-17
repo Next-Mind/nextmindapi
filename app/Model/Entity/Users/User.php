@@ -333,6 +333,18 @@ class User
         return self::getUsers('cpf ="' . $cpf . '"')->fetchObject(self::class);
     }
 
+    public static function isPsychologist($id)
+    {
+        $user = self::getUserById($id);
+
+        if ($user->user_type_id == 3) {
+            return true;
+        }
+
+        return false;
+    }
+
+
     /**
      * Método responsável por retornar Usuários
      *
