@@ -4,7 +4,7 @@ use \App\Http\Response;
 use \App\Controller\Api;
 
 //ROTA PARA INSERIR NOVAS DISPONIBILIDADES
-$obRouter->post('/api/v1/availabilities', [
+$obRouter->post('/v1/availabilities', [
     'middlewares' => [
         'requires-sign-in',
         'requires-psychologist-permission'
@@ -16,7 +16,7 @@ $obRouter->post('/api/v1/availabilities', [
 ]);
 
 //ROTA PARA CONSULTAR DISPONIBILIDADES
-$obRouter->get('/api/v1/availabilities', [
+$obRouter->get('/v1/availabilities', [
     'middlewares' => [
         'requires-sign-in'
     ],
@@ -26,7 +26,7 @@ $obRouter->get('/api/v1/availabilities', [
     }
 ]);
 
-$obRouter->put('/api/v1/availabilities', [
+$obRouter->put('/v1/availabilities', [
     'middlewares' => [
         'requires-sign-in',
         'requires-psychologist-permission'
@@ -37,7 +37,7 @@ $obRouter->put('/api/v1/availabilities', [
     }
 ]);
 
-$obRouter->put('/api/v1/availabilities/reserve', [
+$obRouter->put('/v1/availabilities/reserve', [
     'middlewares' => [
         'requires-sign-in',
     ],

@@ -9,7 +9,7 @@ $usersMiddlewares =  [
 
 
 //ROTA PARA RETORNAR OS DADOS DO USUÁRIO ATUALMENTE CONECTADO
-$obRouter->get('/api/v1/users/me', [
+$obRouter->get('/v1/users/me', [
     'middlewares' => $usersMiddlewares,
     function ($request) {
         return new Response(200, Api\User::getCurrentUser($request), 'application/json');
@@ -17,7 +17,7 @@ $obRouter->get('/api/v1/users/me', [
 ]);
 
 //ROTA PARA ATUALIZAÇÃO DOS DADOS INICIAis DE PERFIL DO USUÁRIO ATUALMENTE CONECTADO
-$obRouter->put('/api/v1/users/me/profile', [
+$obRouter->put('/v1/users/me/profile', [
     'middlewares' => $usersMiddlewares,
     function ($request) {
         return new Response(201, Api\User::setEditLazyUser($request), 'application/json');
@@ -25,7 +25,7 @@ $obRouter->put('/api/v1/users/me/profile', [
 ]);
 
 //ROTA PARA ATUALIZAÇÃO DOS DADOS DE QUESTIONÁRIO OBRIGATÓRIO DO USUÁRIO ATUALMENTE CONECTADO
-$obRouter->put('/api/v1/users/me/questionnaire', [
+$obRouter->put('/v1/users/me/questionnaire', [
     'middlewares' => $usersMiddlewares,
     function ($request) {
         return new Response(201, Api\User::setEditQuestUser($request), 'application/json');
@@ -33,7 +33,7 @@ $obRouter->put('/api/v1/users/me/questionnaire', [
 ]);
 
 //ROTA PARA ATUALIZAÇÃO DO ENDEREÇO DO USUÁRIO ATUALMENTE CONECTADO
-$obRouter->put('/api/v1/users/me/address', [
+$obRouter->put('/v1/users/me/address', [
     'middlewares' => $usersMiddlewares,
     function ($request) {
         return new Response(201, Api\User::setEditAddressUser($request), 'application/json');
@@ -41,7 +41,7 @@ $obRouter->put('/api/v1/users/me/address', [
 ]);
 
 //ROTA PARA ATUALIZAÇÃO DAS INFORMAÇÕES PESSOAIS DO USUÁRIO ATUALMENTE CONECTADO
-$obRouter->put('/api/v1/users/me/personal-info', [
+$obRouter->put('/v1/users/me/personal-info', [
     'middlewares' => $usersMiddlewares,
     function ($request) {
         return new Response(201, Api\User::setEditPersonalUserInfo($request), 'application/json');
@@ -49,7 +49,7 @@ $obRouter->put('/api/v1/users/me/personal-info', [
 ]);
 
 //ROTA PARA ATUALIZAÇÃO DA DESCRIÇÃO (BIO) DO USUÁRIO ATUALMENTE CONECTADO
-$obRouter->put('/api/v1/users/me/profile-description', [
+$obRouter->put('/v1/users/me/profile-description', [
     'middlewares' => $usersMiddlewares,
     function ($request) {
         return new Response(201, Api\User::setEditDescriptionProfileInfo($request), 'application/json');

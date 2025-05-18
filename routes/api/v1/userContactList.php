@@ -8,7 +8,7 @@ $userContactMiddlewares = [
 ];
 
 //ROTA DE LISTAGEM DOS USUÁRIOS ELEGÍVEIS PARA ADICIONAR NA LISTA
-$obRouter->get('/api/v1/contacts/users', [
+$obRouter->get('/v1/contacts/users', [
     'middlewares' => $userContactMiddlewares,
     function ($request) {
         return new Response(200, Api\UserContactList::getEligibleUsersForContactList($request), 'application/json');
@@ -16,7 +16,7 @@ $obRouter->get('/api/v1/contacts/users', [
 ]);
 
 //ROTA DE LISTAGEM DOS CONTATOS DO USUÁRIO
-$obRouter->get('/api/v1/contacts', [
+$obRouter->get('/v1/contacts', [
     'middlewares' => $userContactMiddlewares,
     function ($request) {
         return new Response(200, Api\UserContactList::getUsersContactList($request), 'application/json');
@@ -24,7 +24,7 @@ $obRouter->get('/api/v1/contacts', [
 ]);
 
 //ROTA DE CADASTRO DE USUÁRIO NA LISTA DE CONTATOS DO USER
-$obRouter->post('/api/v1/contacts', [
+$obRouter->post('/v1/contacts', [
     'middlewares' => $userContactMiddlewares,
     function ($request) {
         return new Response(201, Api\UserContactList::setNewContact($request), 'application/json');
@@ -32,7 +32,7 @@ $obRouter->post('/api/v1/contacts', [
 ]);
 
 //ROTA DE ATUALIZAÇÃO DE CONTATO
-$obRouter->put('/api/v1/contacts', [
+$obRouter->put('/v1/contacts', [
     'middlewares' => $userContactMiddlewares,
     function ($request) {
         return new Response(200, Api\UserContactList::setEditContact($request), 'application/json');
@@ -40,7 +40,7 @@ $obRouter->put('/api/v1/contacts', [
 ]);
 
 //ROTA DE EXCLUSÃO DO USUÁRIO NA LISTA DE CONTATOS DO USER
-$obRouter->delete('/api/v1/contacts', [
+$obRouter->delete('/v1/contacts', [
     'middlewares' => $userContactMiddlewares,
     function ($request) {
         return new Response(200, Api\UserContactList::setDeleteContact($request), 'application/json');
