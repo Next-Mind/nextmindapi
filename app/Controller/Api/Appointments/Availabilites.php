@@ -217,7 +217,8 @@ class Availabilites extends Api
         }
 
         //VERIFICA SE A DISPONIBILIDADE EXISTE E SE O PSICÓLOGO É O DONO
-        if (!PsychoAvailabilities::getPsychoAvailabilityByPsychoIdAndId($psychoId, $postVars['availability_id']) instanceof PsychoAvailabilities) {
+        $psychoAvailability = !PsychoAvailabilities::getPsychoAvailabilityByPsychoIdAndId($psychoId, $postVars['availability_id']);
+        if (!$psychoAvailability instanceof PsychoAvailabilities) {
             return parent::getApiResponse(
                 'Error processing the request.',
                 "The availability does not exist.",
@@ -226,7 +227,6 @@ class Availabilites extends Api
         }
 
         //ATUALIZA O STATUS DA DISPONIBILIDADE
-        $psychoAvailability = new PsychoAvailabilities();
         $psychoAvailability->id = $postVars['availability_id'];
         $psychoAvailability->status = (int) $postVars['status'];
         $psychoAvailability->update();
@@ -250,18 +250,16 @@ class Availabilites extends Api
     public static function scheduleAvailabilityByUser($request)
     {
         $postVars = $request->getPostVars();
-        $user = $request->user;
+        $availabilityId = (int)$postVars['availability_id'];
 
         // VERIFICA SE O ID DA DISPONIBILIDADE FOI INFORMADO
-        if (!isset($postVars['availability_id']) || !is_numeric($postVars['availability_id'])) {
+        if (!isset($availabilityId) || !is_numeric($availabilityId)) {
             return parent::getApiResponse(
                 'Error processing the request.',
                 "It is necessary to provide the availability ID.",
                 400
             );
         }
-
-        $availabilityId = (int)$postVars['availability_id'];
 
         // BUSCA A DISPONIBILIDADE
         $availability = PsychoAvailabilities::getPsychoAvailabilitiesById($availabilityId);
