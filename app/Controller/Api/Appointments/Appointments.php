@@ -4,6 +4,7 @@ namespace App\Controller\Api\Appointments;
 
 use App\Controller\Api\Api;
 use App\Model\Entity\Appointments\PsychoAvailabilities;
+use App\Model\Entity\Appointments\PsychoAppointments;
 use App\Model\Entity\Users\User;
 
 class Appointments extends Api
@@ -14,7 +15,43 @@ class Appointments extends Api
      * @param  Request $request
      * @return void
      */
-    public static function setNewAppointment($request) {}
+    public static function setNewAppointment($request) {
+        //POST VARS
+        $postVars = $request->getPostVars();
+
+        //RECUPERA A DISPONIBILIDADE DE HORÁRIO QUE SERÁ AMARRADA A CONSULTA
+        $availabilityId = $postVars["availability_id"];
+
+        //ID DO USUÁRIO QUE ESTÁ MARCANDO A CONSULTA
+        $userId = $request->user->id;
+
+        //VERIFICA SE A DISPONIBILIDADE DE HORÁRIO EXISTE
+        $availability = PsychoAvailabilities::getPsychoAvailabilitiesById($availabilityId);
+        if(!$availability instanceof PsychoAvailabilities) {
+            return parent::getApiResponse('Error processing the request',[
+                'Availability not found'
+            ],400);
+        }
+
+        //VERIFICA SE NÃO HÁ UMA CONSULTA JÁ MARCADA PARA O HORÁRIO
+        $appointment = PsychoAppointments::getAppointmentsByAvailabilityId($availabilityId)->fetchObject(PsychoAppointments::class);
+        if($appointment instanceof PsychoAppointments) {
+            return parent::getApiResponse('Error processing the request',[
+                'Appointment already scheduled for this time'
+            ],400);
+        }
+
+        //VERIFICA SE O USUÁRIO NÃO MARCOU UMA CONSULTA PARA O HORÁRIO
+        $conflictingAppointment = PsychoAppointments::userHasAppointmentAtDatetime($userId,$availability->date);
+        if($conflictingAppointment) {
+            return parent::getApiResponse('Error processing the request',[
+                'User already has an appointment scheduled for this time'
+            ],400);
+        }
+
+        
+
+    }
 
     /**
      * Método responsável por listar as consultas de um usuário

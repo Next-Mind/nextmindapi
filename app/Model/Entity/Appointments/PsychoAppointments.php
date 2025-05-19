@@ -108,16 +108,16 @@ class PsychoAppointments
     public static function getAppointmentsByUserId($userId)
     {
         $sql = "
-        SELECT 
-            pa.*, 
-            u_psy.name AS psychologist_name,
-            av.date AS appointment_datetime
-        FROM psycho_appointments pa
-        JOIN psycho_availabilities av ON pa.availability_id = av.id
-        JOIN users u_psy ON av.psychologist_id = u_psy.id
-        WHERE pa.user_id = ?
-        ORDER BY av.date
-    ";
+            SELECT 
+                pa.*, 
+                u_psy.name AS psychologist_name,
+                av.date AS appointment_datetime
+            FROM psycho_appointments pa
+            JOIN psycho_availabilities av ON pa.availability_id = av.id
+            JOIN users u_psy ON av.psychologist_id = u_psy.id
+            WHERE pa.user_id = ?
+            ORDER BY av.date
+        ";
         return (new Database())->execute($sql, [$userId]);
     }
 
@@ -141,13 +141,16 @@ class PsychoAppointments
     public static function getAppointmentsByPsychologistId($psychologistId)
     {
         $sql = "
-        SELECT pa.*, u.name as user_name, av.date, av.time
-        FROM psycho_appointments pa
-        JOIN psycho_availabilities av ON pa.availability_id = av.id
-        JOIN users u ON pa.user_id = u.id
-        WHERE av.psychologist_id = ?
-        ORDER BY av.date, av.time
-    ";
+            SELECT 
+                pa.*, 
+                u.name as user_name, 
+                av.date, av.time
+            FROM psycho_appointments pa
+            JOIN psycho_availabilities av ON pa.availability_id = av.id
+            JOIN users u ON pa.user_id = u.id
+            WHERE av.psychologist_id = ?
+            ORDER BY av.date, av.time
+        ";
 
         return (new Database())->execute($sql, [$psychologistId]);
     }
@@ -158,5 +161,27 @@ class PsychoAppointments
     public static function getAppointments($where = null, $order = null, $limit = null, $fields = '*')
     {
         return (new Database('psycho_appointments'))->select($where, $order, $limit, $fields);
+    }
+    
+    /**
+     * Método responsável por verificar se o usuário já possui uma consulta agendada para o horário
+     *
+     * @param  int $userId
+     * @param  string $datetime
+     * @return bool
+     */
+    public static function userHasAppointmentAtDatetime($userId, $datetime)
+    {
+        $sql = "
+            SELECT pa.id
+            FROM psycho_appointments pa
+            JOIN psycho_availabilities av ON pa.availability_id = av.id
+            WHERE pa.user_id = ? AND av.date = ?
+            LIMIT 1
+        ";
+
+        return (new Database())
+            ->execute($sql, [$userId, $datetime])
+            ->fetchObject() ? true : false;
     }
 }
