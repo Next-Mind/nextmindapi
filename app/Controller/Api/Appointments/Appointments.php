@@ -42,7 +42,7 @@ class Appointments extends Api
         }
 
         //VERIFICA SE A DISPONIBILIDADE NÃO ESTÁ OCUPADA
-        if ($availability->status != 0) {
+        if ($availability->status != 2) {
             return parent::getApiResponse('Error processing the request', [
                 'Availability is not available for booking'
             ], 400);
