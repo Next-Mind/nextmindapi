@@ -46,3 +46,13 @@ $obRouter->put('/api/v1/availabilities/reserve', [
         return new Response($response['code'], $response, 'application/json');
     }
 ]);
+
+$obRouter->post('/api/v1/appointments', [
+    'middlewares' => [
+        'requires-sign-in',
+    ],
+    function ($request) {
+        $response = Api\Appointments\Appointments::setNewAppointment($request);
+        return new Response($response['code'], $response, 'application/json');
+    }
+]);

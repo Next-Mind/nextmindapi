@@ -15,7 +15,8 @@ class Appointments extends Api
      * @param  Request $request
      * @return void
      */
-    public static function setNewAppointment($request) {
+    public static function setNewAppointment($request)
+    {
         //POST VARS
         $postVars = $request->getPostVars();
 
@@ -25,32 +26,60 @@ class Appointments extends Api
         //ID DO USUÁRIO QUE ESTÁ MARCANDO A CONSULTA
         $userId = $request->user->id;
 
+        //VERIFICA O ID DA DISPONIBILIDADE É VÁLIDO
+        if (empty($availabilityId) || !is_numeric($availabilityId)) {
+            return parent::getApiResponse('Error processing the request', [
+                'Invalid availability ID'
+            ], 400);
+        }
+
         //VERIFICA SE A DISPONIBILIDADE DE HORÁRIO EXISTE
         $availability = PsychoAvailabilities::getPsychoAvailabilitiesById($availabilityId);
-        if(!$availability instanceof PsychoAvailabilities) {
-            return parent::getApiResponse('Error processing the request',[
+        if (!$availability instanceof PsychoAvailabilities) {
+            return parent::getApiResponse('Error processing the request', [
                 'Availability not found'
-            ],400);
+            ], 400);
+        }
+
+        //VERIFICA SE A DISPONIBILIDADE NÃO ESTÁ OCUPADA
+        if ($availability->status != 0) {
+            return parent::getApiResponse('Error processing the request', [
+                'Availability is not available for booking'
+            ], 400);
+        }
+
+        //VERIFICA SE NÃO É UMA DISPONIBILIDADE ANTIGA
+        if (strtotime($availability->date) <= time()) {
+            return parent::getApiResponse('Error processing the request', [
+                'Cannot schedule an appointment in the past'
+            ], 400);
         }
 
         //VERIFICA SE NÃO HÁ UMA CONSULTA JÁ MARCADA PARA O HORÁRIO
         $appointment = PsychoAppointments::getAppointmentsByAvailabilityId($availabilityId)->fetchObject(PsychoAppointments::class);
-        if($appointment instanceof PsychoAppointments) {
-            return parent::getApiResponse('Error processing the request',[
+        if ($appointment instanceof PsychoAppointments) {
+            return parent::getApiResponse('Error processing the request', [
                 'Appointment already scheduled for this time'
-            ],400);
+            ], 400);
         }
 
         //VERIFICA SE O USUÁRIO NÃO MARCOU UMA CONSULTA PARA O HORÁRIO
-        $conflictingAppointment = PsychoAppointments::userHasAppointmentAtDatetime($userId,$availability->date);
-        if($conflictingAppointment) {
-            return parent::getApiResponse('Error processing the request',[
+        $conflictingAppointment = PsychoAppointments::userHasAppointmentAtDatetime($userId, $availability->date);
+        if ($conflictingAppointment) {
+            return parent::getApiResponse('Error processing the request', [
                 'User already has an appointment scheduled for this time'
-            ],400);
+            ], 400);
         }
 
-        
+        $appointment = new PsychoAppointments();
+        $appointment->availability_id = $availabilityId;
+        $appointment->user_id = $userId;
+        $appointment->description = $postVars["description"] ?? null;
+        $appointment->register();
 
+        return parent::getApiResponse('Appointment successfully scheduled', [
+            'appointment' => $appointment->getPartialData()
+        ]);
     }
 
     /**

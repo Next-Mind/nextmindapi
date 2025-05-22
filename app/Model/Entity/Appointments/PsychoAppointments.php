@@ -162,7 +162,7 @@ class PsychoAppointments
     {
         return (new Database('psycho_appointments'))->select($where, $order, $limit, $fields);
     }
-    
+
     /**
      * Método responsável por verificar se o usuário já possui uma consulta agendada para o horário
      *
@@ -183,5 +183,18 @@ class PsychoAppointments
         return (new Database())
             ->execute($sql, [$userId, $datetime])
             ->fetchObject() ? true : false;
+    }
+
+    public function getPartialData()
+    {
+        return [
+            'id'                => $this->id,
+            'availability_id'   => $this->availability_id,
+            'user_id'           => $this->user_id,
+            'description'       => $this->description,
+            'status'            => $this->status,
+            'created_at'        => $this->created_at,
+            'updated_at'        => $this->updated_at
+        ];
     }
 }
