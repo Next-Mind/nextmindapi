@@ -71,6 +71,7 @@ class Appointments extends Api
             ], 400);
         }
 
+        //CRIA A CONSULTA
         $appointment = new PsychoAppointments();
         $appointment->availability_id = $availabilityId;
         $appointment->user_id = $userId;

@@ -8,7 +8,7 @@ use \App\Controller\Api;
 //Desta forma, nós chamamos o método handleFirebaseAuth que verificará se o usuário local já está injetado no objeto de request
 //Caso não esteja, nós entendemos de que se trata de um novo usuário (lembrando, um usuário que faz parte do nosso domínio) e aciona o método de cadastro na API
 //Caso esteja, nós prosseguimos com o login na API normalmente.
-$obRouter->post('/api/v1/auth', [
+$obRouter->post('/v1/auth', [
     'middlewares' => [],
     function ($request) {
         $response = Api\Auth::handleFirebaseAuth($request);
