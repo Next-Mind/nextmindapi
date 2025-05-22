@@ -53,12 +53,15 @@ class PsychoAvailabilities
      */
     public function register()
     {
+        $this->created_at = date('Y-m-d H:i:s');
+        $this->updated_at = date('Y-m-d H:i:s');
+
         return $this->id = (new Database('psycho_availabilities'))->insert([
             'psychologist_id' => $this->psychologist_id,
             'date' => $this->date,
             'status' => $this->status,
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s')
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at
         ]);
     }
 
@@ -68,11 +71,13 @@ class PsychoAvailabilities
      */
     public function update()
     {
+        $this->updated_at = date('Y-m-d H:i:s');
+
         return (new Database('psycho_availabilities'))->update('id = ' . $this->id, [
             'psychologist_id' => $this->psychologist_id,
             'date' => $this->date,
             'status' => $this->status,
-            'updated_at' => date('Y-m-d H:i:s')
+            'updated_at' => $this->updated_at
         ]);
     }
 

@@ -5,15 +5,26 @@ namespace App\Controller\Api\Appointments;
 use App\Controller\Api\Api;
 use App\Model\Entity\Appointments\PsychoAvailabilities;
 use App\Model\Entity\Appointments\PsychoAppointments;
-use App\Model\Entity\Users\User;
+use App\Utils\Logger\Logger;
 
 class Appointments extends Api
 {
+
+    private static $logger = null;
+
+    protected static function getLogger()
+    {
+        if (self::$logger === null) {
+            self::$logger = new Logger('appointmentsController');
+        }
+        return self::$logger;
+    }
+
     /**
      * Método responsável por criar uma nova consulta no sistema
      *
      * @param  Request $request
-     * @return void
+     * @return array
      */
     public static function setNewAppointment($request)
     {
@@ -26,6 +37,7 @@ class Appointments extends Api
         //ID DO USUÁRIO QUE ESTÁ MARCANDO A CONSULTA
         $userId = $request->user->id;
 
+        self::getLogger()->debug('Validando ID da Disponibilidade: ' . $availabilityId);
         //VERIFICA O ID DA DISPONIBILIDADE É VÁLIDO
         if (empty($availabilityId) || !is_numeric($availabilityId)) {
             return parent::getApiResponse('Error processing the request', [
@@ -33,44 +45,50 @@ class Appointments extends Api
             ], 400);
         }
 
+        self::getLogger()->debug('Validando se o horário existe');
         //VERIFICA SE A DISPONIBILIDADE DE HORÁRIO EXISTE
         $availability = PsychoAvailabilities::getPsychoAvailabilitiesById($availabilityId);
         if (!$availability instanceof PsychoAvailabilities) {
             return parent::getApiResponse('Error processing the request', [
                 'Availability not found'
-            ], 400);
+            ], 400, self::REQUEST_ERROR);
         }
 
+        self::getLogger()->debug('Validando Status da Disponibilidade: ' . $availability->status);
         //VERIFICA SE A DISPONIBILIDADE NÃO ESTÁ OCUPADA
         if ($availability->status != 2) {
             return parent::getApiResponse('Error processing the request', [
                 'Availability is not available for booking'
-            ], 400);
+            ], 400, self::REQUEST_ERROR);
         }
 
+        self::getLogger()->debug('Validando se não é disponibilidade antiga: ');
         //VERIFICA SE NÃO É UMA DISPONIBILIDADE ANTIGA
         if (strtotime($availability->date) <= time()) {
             return parent::getApiResponse('Error processing the request', [
                 'Cannot schedule an appointment in the past'
-            ], 400);
+            ], 400, self::REQUEST_ERROR);
         }
 
+        self::getLogger()->debug('Validando se não há consulta marcada para o horário: ');
         //VERIFICA SE NÃO HÁ UMA CONSULTA JÁ MARCADA PARA O HORÁRIO
         $appointment = PsychoAppointments::getAppointmentsByAvailabilityId($availabilityId)->fetchObject(PsychoAppointments::class);
         if ($appointment instanceof PsychoAppointments) {
             return parent::getApiResponse('Error processing the request', [
                 'Appointment already scheduled for this time'
-            ], 400);
+            ], 400, self::REQUEST_ERROR);
         }
 
+        self::getLogger()->debug('Validando se o usuário não tem consulta marcada para o mesmo horário: ');
         //VERIFICA SE O USUÁRIO NÃO MARCOU UMA CONSULTA PARA O HORÁRIO
         $conflictingAppointment = PsychoAppointments::userHasAppointmentAtDatetime($userId, $availability->date);
         if ($conflictingAppointment) {
             return parent::getApiResponse('Error processing the request', [
                 'User already has an appointment scheduled for this time'
-            ], 400);
+            ], 400, self::REQUEST_ERROR);
         }
 
+        self::getLogger()->debug('Criando a consulta: ');
         //CRIA A CONSULTA
         $appointment = new PsychoAppointments();
         $appointment->availability_id = $availabilityId;

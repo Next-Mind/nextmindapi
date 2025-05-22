@@ -4,6 +4,8 @@ namespace App\Controller\Api;
 
 class Api
 {
+    const REQUEST_SUCCESS = 'success';
+    const REQUEST_ERROR = 'error';
 
     /**
      * Método responsável por retornar os detalhes da API
@@ -28,10 +30,10 @@ class Api
      * @param  int $httpCode
      * @return array
      */
-    protected static function getApiResponse(String $message, $data, $httpCode = 200)
+    protected static function getApiResponse(String $message, $data, $httpCode = 200, $status = self::REQUEST_SUCCESS)
     {
         return [
-            'status' => 'success',
+            'status' => $status,
             'code' => $httpCode,
             'message' => $message,
             'data' => $data,

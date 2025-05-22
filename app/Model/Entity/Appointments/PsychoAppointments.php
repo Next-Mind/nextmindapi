@@ -9,20 +9,20 @@ use \WilliamCosta\DatabaseManager\Database;
  */
 class PsychoAppointments
 {
-    public int $id;
-    public int $availability_id;
-    public int $user_id;
-    public string $description;
-    public string $resolution;
-    public string $notes_private;
-    public string $attachment_path;
-    public string $session_link;
-    public string $status = 'scheduled';
-    public string $cancelled_by;
-    public string $cancel_reason;
-    public int $duration_minutes;
-    public int $rating;
-    public bool $reminder_sent = false;
+    public $id;
+    public $availability_id;
+    public $user_id;
+    public $description;
+    public $resolution;
+    public $notes_private;
+    public $attachment_path;
+    public $session_link;
+    public $status = 'scheduled';
+    public $cancelled_by;
+    public $cancel_reason;
+    public $duration_minutes;
+    public $rating;
+    public $reminder_sent = false;
     public $created_at;
     public $updated_at;
 
@@ -34,6 +34,9 @@ class PsychoAppointments
      */
     public function register()
     {
+        $this->created_at = date('Y-m-d H:i:s');
+        $this->updated_at = date('Y-m-d H:i:s');
+
         return $this->id = (new Database('psycho_appointments'))->insert([
             'availability_id'   => $this->availability_id,
             'user_id'           => $this->user_id,
@@ -48,8 +51,8 @@ class PsychoAppointments
             'duration_minutes'  => $this->duration_minutes,
             'rating'            => $this->rating,
             'reminder_sent'     => $this->reminder_sent,
-            'created_at'        => date('Y-m-d H:i:s'),
-            'updated_at'        => date('Y-m-d H:i:s')
+            'created_at'        => $this->created_at,
+            'updated_at'        => $this->updated_at
         ]);
     }
 
@@ -60,6 +63,8 @@ class PsychoAppointments
      */
     public function update()
     {
+        $this->updated_at = date('Y-m-d H:i:s');
+
         return (new Database('psycho_appointments'))->update('id = ' . $this->id, [
             'availability_id'   => $this->availability_id,
             'user_id'           => $this->user_id,
@@ -74,7 +79,7 @@ class PsychoAppointments
             'duration_minutes'  => $this->duration_minutes,
             'rating'            => $this->rating,
             'reminder_sent'     => $this->reminder_sent,
-            'updated_at'        => date('Y-m-d H:i:s')
+            'updated_at'        => $this->updated_at
         ]);
     }
 
@@ -185,6 +190,11 @@ class PsychoAppointments
             ->fetchObject() ? true : false;
     }
 
+    /**
+     * Retorna os dados parciais da consulta
+     *
+     * @return array
+     */
     public function getPartialData()
     {
         return [
