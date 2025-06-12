@@ -7,6 +7,7 @@ use \App\Model\Entity\Users\User as EntityUser;
 use Dom\Entity;
 use Exception;
 use \WilliamCosta\DatabaseManager\Pagination;
+use App\Utils\Logger\Logger;
 
 class UserContactList extends Api
 {
@@ -32,11 +33,16 @@ class UserContactList extends Api
         //QUANTIDADE POR PÁGINA
         $qtdPagina = $queryParams['results'] ?? 5;
 
+        $order_by = $queryParams['order_by'];
+
+        $orderSql = $order_by == 'last_add' ? 'DESC' : 'ASC';
+
+
         //INSTANCIA DE PAGINAÇÃO
         $obPagination = new Pagination($totalLength, $paginaAtual, $qtdPagina);
 
         //RESULTADOS DA PÁGINA
-        $results = EntityUserContactList::getContacts('user_id = ' . $request->user->id, 'created_at ASC', $obPagination->getLimit());
+        $results = EntityUserContactList::getContacts('user_id = ' . $request->user->id, 'created_at ' . $orderSql, $obPagination->getLimit());
 
         //RENDERIZA O ITEM
         while ($obUserContactList = $results->fetchObject(EntityUserContactList::class)) {
@@ -124,33 +130,45 @@ class UserContactList extends Api
      */
     public static function setNewContact($request)
     {
+
+        $logger = new Logger('user_contact_list');
+
         //OBTÉM VARIÁVEIS DO POST
         $postVars = $request->getPostVars();
 
+        $contactId = (int) $postVars["contact_id"];
+
+        $logger->debug('POST VARS: ' . print_r($postVars, true));
+
         //VALIDA SE FOI DIGITADO UM NÚMERO
-        if (!is_numeric($postVars["contact_id"])) {
+        if (!is_numeric($contactId)) {
+            $logger->debug('ID não é número');
             throw new Exception("Please enter a valid number!", 400);
         }
 
         //VALIDA CAMPOS OBRIGATÓRIOS
         if (!isset($postVars["contact_id"])) {
+            $logger->debug('Faltou ID');
             throw new Exception("The 'contact_id' field is required!", 400);
         }
 
         //VALIDA SE O ID INFORMADO NO POST É IGUAL AO ID DO USUÁRIO LOGADO
         if ($request->user->id == $postVars["contact_id"]) {
+            $logger->debug('Tentou se adicionar');
             throw new Exception("You can't add yourself to your contact list!", 400);
         }
 
         //VALIDA SE O USUÁRIO INFORMADO EXISTE
         $obUser = EntityUser::getUserById($postVars["contact_id"]);
         if (!$obUser instanceof EntityUser) {
+            $logger->debug('ID não existe');
             throw new Exception("This user doesn't exist!", 400);
         }
 
         //VALIDA SE JÁ ESTÁ NA LISTA DE CONTATOS
         $hasUserInContactList = EntityUserContactList::isUserInContactList($request->user->id, $postVars["contact_id"]);
         if ($hasUserInContactList instanceof EntityUserContactList) {
+            $logger->debug('Id já está na lista');
             throw new Exception("This user is already in the logged-in user's contact list!", 400);
         }
 
@@ -160,7 +178,7 @@ class UserContactList extends Api
         $obUserContact->contact_id = $postVars["contact_id"];
         $obUserContact->nickname = $postVars["nickname"] ?? EntityUser::getUserById($postVars["contact_id"])->name;
         $obUserContact->register();
-
+        $logger->debug('Deu bom');
         return parent::getApiResponse('Successful in adding the user to the contact list', $obUserContact, 201);
     }
 

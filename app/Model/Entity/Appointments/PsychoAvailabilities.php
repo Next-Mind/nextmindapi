@@ -9,6 +9,13 @@ use \WilliamCosta\DatabaseManager\Database;
  */
 class PsychoAvailabilities
 {
+
+    const STATUS_CANCELLED = 0;
+    const STATUS_AVAILABLE = 1;
+    const STATUS_PRE_RESERVED = 2;
+    const STATUS_RESERVED = 3;
+
+
     /**
      * @var int
      * ID no Banco de Dados da Disponibilidade

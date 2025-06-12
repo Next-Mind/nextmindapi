@@ -2,6 +2,7 @@
 
 use \App\Http\Response;
 use \App\Controller\Api;
+use App\Controller\Api\Psychologist;
 
 $usersMiddlewares =  [
     'requires-sign-in'
@@ -55,3 +56,10 @@ $obRouter->put('/v1/users/me/profile-description', [
         return new Response(201, Api\User::setEditDescriptionProfileInfo($request), 'application/json');
     }
 ]);
+
+//ROTA PARA CONSULTA DE PSICÓLOGOS DISPONÍVEIS
+$obRouter->get('/v1/psychologists', [
+    'middlewares' => $usersMiddlewares
+], function ($request) {
+    return new Response(200, Api\Psychologist::getPsychologists($request), 'application/json');
+});

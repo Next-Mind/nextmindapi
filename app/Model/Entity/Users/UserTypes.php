@@ -6,6 +6,11 @@ use \WilliamCosta\DatabaseManager\Database;
 
 class UserTypes
 {
+
+    const USER = 1;
+    const PSYCHOLOGIST = 3;
+    const ADMIN = 7;
+
     /**
      * ID do registro
      *

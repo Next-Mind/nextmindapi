@@ -5,7 +5,10 @@ namespace App\Controller\Api\Appointments;
 use App\Controller\Api\Api;
 use App\Model\Entity\Appointments\PsychoAvailabilities;
 use App\Model\Entity\Appointments\PsychoAppointments;
+use App\Model\Entity\Users\UserTypes;
 use App\Utils\Logger\Logger;
+use WilliamCosta\DatabaseManager\Pagination;
+
 
 class Appointments extends Api
 {
@@ -107,15 +110,111 @@ class Appointments extends Api
      * @param  Request $request
      * @return void
      */
-    public static function listAppointmentsByUser($request) {}
+    public static function listAppointmentsByUser($request)
+    {
+        return parent::getApiResponse('Successful return of the list of appointments', [
+            'appointments' => self::listAppointmentsByUserItems($request, $obPagination),
+            'pagination'   => parent::getPagination($request, $obPagination)
+        ]);
+    }
+
+    /**
+     * Método responsável por listar os itens de consulta de um usuário
+     *
+     * @param  Request $request
+     * @param  Pagination $obPagination
+     * @return array
+     */
+    private static function listAppointmentsByUserItems($request, &$obPagination)
+    {
+        $items = [];
+
+        //QUANTIDADE TOTAL DE REGISTROS
+        $totalLength = PsychoAppointments::getAppointments('user_id = ' . $request->user->id, null, null, 'COUNT(*) as total')->fetchObject()->total;
+
+        //PÁGINA ATUAL
+        $queryParams = $request->getQueryParams();
+        $paginaAtual = $queryParams['page'] ?? 1;
+
+        //QUANTIDADE POR PÁGINA
+        $qtdPagina = $queryParams['results'] ?? 5;
+
+        //INSTANCIA DE PAGINAÇÃO
+        $obPagination = new Pagination($totalLength, $paginaAtual, $qtdPagina);
+
+        //RESULTADOS DA PÁGINA
+        $results = PsychoAppointments::getAppointmentsByUserId($request->user->id, $obPagination->getLimit());
+
+        while ($obAppointment = $results->fetchObject(PsychoAppointments::class)) {
+            $items[] = [
+                'id' => $obAppointment->id,
+                'availability_id' => $obAppointment->availability_id,
+                'pyschologist_name' => $obAppointment->psychologist_name,
+                'appointment_datetime' => $obAppointment->appointment_datetime,
+                'status' => $obAppointment->status,
+                'created_at' => $obAppointment->created_at,
+                'updated_at' => $obAppointment->updated_at
+            ];
+        }
+
+        return $items;
+    }
+
+    /**
+     * Método responsável por renderizar cada consulta de um psicólogo
+     *
+     * @param  Request $request
+     * @param  Pagination $obPagination
+     * @return array
+     */
+    private static function listAppointmentsByPsychologistItems($request, &$obPagination)
+    {
+        $items = [];
+
+        //QUANTIDADE TOTAL DE REGISTROS
+        $totalLength = PsychoAppointments::getAppointments('psychologist_id = ' . $request->user->id, null, null, 'COUNT(*) as total')->fetchObject()->total;
+
+        //PÁGINA ATUAL
+        $queryParams = $request->getQueryParams();
+        $paginaAtual = $queryParams['page'] ?? 1;
+
+        //QUANTIDADE POR PÁGINA
+        $qtdPagina = $queryParams['results'] ?? 5;
+
+        //INSTANCIA DE PAGINAÇÃO
+        $obPagination = new Pagination($totalLength, $paginaAtual, $qtdPagina);
+
+        //RESULTADOS DA PÁGINA
+        $results = PsychoAppointments::getAppointmentsByPsychologistId($request->user->id, $obPagination->getLimit());
+
+        while ($obAppointment = $results->fetchObject(PsychoAppointments::class)) {
+            $items[] = [
+                'id' => $obAppointment->id,
+                'availability_id' => $obAppointment->availability_id,
+                'pyschologist_name' => $obAppointment->psychologist_name,
+                'appointment_datetime' => $obAppointment->appointment_datetime,
+                'status' => $obAppointment->status,
+                'created_at' => $obAppointment->created_at,
+                'updated_at' => $obAppointment->updated_at
+            ];
+        }
+
+        return $items;
+    }
 
     /**
      * Método responsável por listar as consultas de um psicólogo
      *
-     * @param  mixed $request
+     * @param  Request $request
      * @return void
      */
-    public static function listAppointmentsByPsychologist($request) {}
+    public static function listAppointmentsByPsychologist($request)
+    {
+        return parent::getApiResponse('Successful return of the list of appointments', [
+            'appointments' => self::listAppointmentsByPsychologistItems($request, $obPagination),
+            'pagination'   => parent::getPagination($request, $obPagination)
+        ]);
+    }
 
     /**
      * Método responsável por cancelar uma consulta
@@ -123,7 +222,73 @@ class Appointments extends Api
      * @param  mixed $request
      * @return void
      */
-    public static function cancelAppointment($request) {}
+    public static function cancelAppointment($request)
+    {
+        //ID DO USUÁRIO QUE ESTÁ REQUISITANDO O CANCELAMENTO
+        $userId = $request->user->id;
+        $userType = $request->user->user_type_id;
+
+        //POST VARS
+        $postVars = $request->getPostVars();
+
+        //ID DA CONSULTA A SER CANCELADA
+        $appointmentId = $postVars["appointment_id"] ?? null;
+
+        //VALIDA SE O ID DA CONSULTA É VÁLIDO
+        if (empty($appointmentId) || !is_numeric($appointmentId)) {
+            return parent::getApiResponse('Error processing the request', [
+                'Invalid appointment ID'
+            ], 400);
+        }
+
+        //RECUPERA A CONSULTA
+        $appointment = PsychoAppointments::getAppointmentById($appointmentId);
+
+        //RECUPERA A DISPONIBILIDADE DE HORÁRIO
+        $availability = PsychoAvailabilities::getPsychoAvailabilitiesById($appointment->availability_id);
+
+        $userTypeNanme = '';
+
+        switch ($userType) {
+            case UserTypes::USER:
+                //VERIFICA SE A CONSULTA FOI AGENDADA POR ESTE MESMO USUÁRIO ANTERIORMENTE
+                if ($userId != $appointment->user_id) {
+                    return parent::getApiResponse('Error processing the request', [
+                        'You can only cancel your own appointments'
+                    ], 403);
+                }
+                break;
+
+            case UserTypes::PSYCHOLOGIST:
+                //VERIFICA SE A CONSULTA FOI AGENDADA POR ESTE MESMO PSICÓLOGO ANTERIORMENTE
+                if ($userId != $availability->psychologist_id) {
+                    return parent::getApiResponse('Error processing the request', [
+                        'You can only cancel your own appointments'
+                    ], 403);
+                }
+                break;
+
+            case UserTypes::ADMIN:
+                break;
+
+            default:
+                return parent::getApiResponse('Error processing the request', [
+                    'Internal Server Error: Invalid user type or missing'
+                ], 500);
+                break;
+        }
+
+        $appointment->cancelled_by = $userId;
+        $appointment->cancel_reason = $postVars["cancel_reason"] ?? null;
+        $appointment->status = PsychoAppointments::STATUS_CANCELLED;
+        $appointment->update();
+        time() > $availability->date ? $availability->status = PsychoAvailabilities::STATUS_CANCELLED : $availability->status = PsychoAvailabilities::STATUS_AVAILABLE;
+        $availability->update();
+
+        return parent::getApiResponse('Appointment successfully cancelled', [
+            'appointment' => $appointment->getPartialData()
+        ]);
+    }
 
     /**
      * Método responsável por atualizar o status de uma consulta (Concluído ou não compareceu)

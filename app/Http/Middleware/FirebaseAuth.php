@@ -16,8 +16,10 @@ class FirebaseAuth
     private function injectLocalUser($request)
     {
         $email = $request->firebaseUser->email;
+        $this->logger->debug("Injetando usuário local com email: {$email}");
         $obUserEmail = EntityUser::getUserByEmail($email);
         if ($obUserEmail instanceof EntityUser) {
+            $this->logger->debug("Usuário local injetado: {$obUserEmail->name} ({$obUserEmail->email})");
             $request->user = $obUserEmail;
         }
         return true;

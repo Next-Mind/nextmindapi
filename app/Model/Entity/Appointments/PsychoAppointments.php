@@ -9,6 +9,11 @@ use \WilliamCosta\DatabaseManager\Database;
  */
 class PsychoAppointments
 {
+    const STATUS_SCHEDULED = 'scheduled';
+    const STATUS_COMPLETED = 'completed';
+    const STATUS_CANCELLED = 'cancelled';
+    const STATUS_NO_SHOW = 'no_show';
+
     public $id;
     public $availability_id;
     public $user_id;
@@ -25,6 +30,8 @@ class PsychoAppointments
     public $reminder_sent = false;
     public $created_at;
     public $updated_at;
+    public $psychologist_name;
+    public $appointment_datetime;
 
 
     /**
@@ -110,8 +117,10 @@ class PsychoAppointments
      * @param  int $userId
      * @return PDOStatement
      */
-    public static function getAppointmentsByUserId($userId)
+    public static function getAppointmentsByUserId($userId, $limit = null)
     {
+
+        $limit = strlen($limit) ? 'LIMIT ' . $limit : '';
         $sql = "
             SELECT 
                 pa.*, 
@@ -122,7 +131,7 @@ class PsychoAppointments
             JOIN users u_psy ON av.psychologist_id = u_psy.id
             WHERE pa.user_id = ?
             ORDER BY av.date
-        ";
+        " . $limit;
         return (new Database())->execute($sql, [$userId]);
     }
 

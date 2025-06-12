@@ -56,3 +56,13 @@ $obRouter->post('/v1/appointments', [
         return new Response($response['code'], $response, 'application/json');
     }
 ]);
+
+$obRouter->get('/v1/appointments/user', [
+    'middlewares' => [
+        'requires-sign-in',
+    ],
+    function ($request) {
+        $response = Api\Appointments\Appointments::listAppointmentsByUser($request);
+        return new Response($response['code'], $response, 'application/json');
+    }
+]);

@@ -200,7 +200,7 @@ class User extends Api
 
         //VERIFICANDO SE NÃO HÁ OUTRO USUÁRIO COM O MESMO CPF
         $obUserCpf = EntityUser::getUserByCpf($personal_info['cpf']);
-        if ($obUserCpf instanceof EntityUser) {
+        if ($obUserCpf instanceof EntityUser && $obUserCpf->id != $request->user->id) {
             throw new Exception('This CPF is already in use by another person!', 400);
         }
 
@@ -255,5 +255,24 @@ class User extends Api
                 'address_complete' => (bool) $request->user->address_complete
             ]
         ]);
+    }
+
+    //REMOVER ISSO O MAIS RAPIDO POSSIVEL
+    public static function returnAllUsersInfo()
+    {
+
+        $itens = [];
+
+        $users = EntityUser::getUsers();
+
+        while ($obUser = $users->fetchObject(EntityUser::class)) {
+            $itens[] = [
+                'id' => $obUser->id,
+                'name' => $obUser->name,
+                'email' => $obUser->email
+            ];
+        }
+
+        return parent::getApiResponse('Não esquecer de remover esta rota', $itens, 200);
     }
 }
